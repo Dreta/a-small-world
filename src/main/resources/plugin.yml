@@ -1,0 +1,7 @@
+name: ASmallWorld
+version: ${project.version}
+main: dev.dreta.asmallworld.ASmallWorld
+api-version: 1.17
+authors: [ Dreta ]
+description: A curated 2.5D Minecraft experience.
+website: https://dreta.dev
