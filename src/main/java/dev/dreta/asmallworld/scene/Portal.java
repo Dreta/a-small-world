@@ -19,13 +19,13 @@
 package dev.dreta.asmallworld.scene;
 
 import dev.dreta.asmallworld.ASmallWorld;
+import dev.dreta.asmallworld.player.Camera;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -101,25 +101,25 @@ public class Portal {
      * Begin the teleportation process when the player entered
      * this portal.
      *
-     * @param player The player to teleport
+     * @param camera The player to teleport
      */
-    public void beginTeleportation(Player player) {
-        tpTasks.put(player.getUniqueId().toString(), Bukkit.getScheduler().runTaskLater(ASmallWorld.inst(),
+    public void beginTeleportation(Camera camera) {
+        tpTasks.put(camera.getUniqueId().toString(), Bukkit.getScheduler().runTaskLater(ASmallWorld.inst(),
                 () -> {
-                    tpTasks.remove(player.getUniqueId().toString());
+                    tpTasks.remove(camera.getUniqueId().toString());
                     if (useLoadScreen) {
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 10, false, false, false));
+                        camera.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 10, false, false, false));
                         // TODO Placeholders
-                        player.showTitle(Title.title(Component.text(ASmallWorld.inst().getConf().getString("scene.portal.load-screen.title.title")),
+                        camera.getPlayer().showTitle(Title.title(Component.text(ASmallWorld.inst().getConf().getString("scene.portal.load-screen.title.title")),
                                 Component.text(ASmallWorld.inst().getConf().getString("scene.portal.load-screen.title.subtitle")), Title.Times.of(Ticks.duration(0), Ticks.duration(999999), Ticks.duration(0))));
-                        player.sendActionBar(Component.text(ASmallWorld.inst().getConf().getString("scene.portal.load-screen.title.actionbar")));
+                        camera.getPlayer().sendActionBar(Component.text(ASmallWorld.inst().getConf().getString("scene.portal.load-screen.title.actionbar")));
                         Bukkit.getScheduler().runTaskLater(ASmallWorld.inst(), () -> {
-                            player.removePotionEffect(PotionEffectType.BLINDNESS);
-                            player.clearTitle();
-                            getTarget().teleportPlayer(player);
+                            camera.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+                            camera.getPlayer().clearTitle();
+                            getTarget().teleportPlayer(camera);
                         }, ASmallWorld.inst().getConf().getInt("scene.portal.load-screen.duration") / 100 * 20);
                     } else {
-                        getTarget().teleportPlayer(player);
+                        getTarget().teleportPlayer(camera);
                     }
                 }, ASmallWorld.inst().getConf().getInt("scene.portal.delay") / 1000 * 20));
     }
@@ -128,11 +128,11 @@ public class Portal {
      * If a player left this portal before the teleportation
      * commenced, cancel the teleportation task.
      *
-     * @param player The player to cancel the task for.
+     * @param camera The player to cancel the task for.
      */
-    public void cancelTeleportation(Player player) {
-        if (tpTasks.containsKey(player.getUniqueId().toString())) {
-            tpTasks.remove(player.getUniqueId().toString()).cancel();
+    public void cancelTeleportation(Camera camera) {
+        if (tpTasks.containsKey(camera.getUniqueId().toString())) {
+            tpTasks.remove(camera.getUniqueId().toString()).cancel();
         }
     }
 

@@ -19,14 +19,15 @@
 package dev.dreta.asmallworld.scene;
 
 import dev.dreta.asmallworld.ASmallWorld;
+import dev.dreta.asmallworld.player.Camera;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -105,6 +106,12 @@ public class Scene implements ConfigurationSerializable {
      */
     @Getter
     private final List<Portal> portals;
+
+    /**
+     * The cameras that are currently in this scene.
+     */
+    @Getter
+    private final List<UUID> cameras = new ArrayList<>();
 
     public Scene(String name, World world, int x, int y, int z, List<Portal> portals) {
         this(ASmallWorld.inst().getData().getScenes().keySet().stream().max(Integer::compareTo).get() + 1, name, world, x, y, z, portals);
@@ -189,11 +196,12 @@ public class Scene implements ConfigurationSerializable {
     /**
      * Teleport a player to the player area.
      *
-     * @param player The player to teleport
+     * @param camera The player to teleport
      */
-    public void teleportPlayer(Player player) {
+    public void teleportPlayer(Camera camera) {
         // TODO Teleport the player's associated entity as well
-        player.teleport(new Location(world, x + 12 + 0.5, y + HEIGHT - 2, z + FULL_WIDTH + 0.5, 180, 50));
+        camera.setScene(this);
+        camera.getPlayer().teleport(new Location(world, x + 12 + 0.5, y + HEIGHT - 2, z + FULL_WIDTH + 0.5, 180, 50));
     }
 
     @Override

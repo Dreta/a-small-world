@@ -20,11 +20,14 @@ package dev.dreta.asmallworld;
 
 import co.aikar.commands.PaperCommandManager;
 import dev.dreta.asmallworld.data.DataStore;
+import dev.dreta.asmallworld.player.CameraListener;
 import dev.dreta.asmallworld.test.SceneTestCommand;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
+import net.milkbowl.vault.chat.Chat;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 public final class ASmallWorld extends JavaPlugin {
@@ -35,6 +38,9 @@ public final class ASmallWorld extends JavaPlugin {
     private Configuration conf;
     @Getter
     private DataStore data;
+
+    @Getter
+    private Chat chat;
 
     public ASmallWorld() {
         inst = this;
@@ -48,12 +54,49 @@ public final class ASmallWorld extends JavaPlugin {
     public void onEnable() {
         logger = Logger.getLogger("Minecraft");
 
+        // Check for dependencies
+        if (!getServer().getPluginManager().isPluginEnabled("Vault")) {
+            logger.severe("ASW requires Vault to properly function. Please install Vault before continuing.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        if (!getServer().getPluginManager().isPluginEnabled("ProtocolLib")) {
+            logger.severe("ASW requires ProtocolLib to properly function. Please install Vault before continuing.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        // Load configuration and data
         conf = Configuration.loadConfiguration("config.yml");
         data = new DataStore();
 
+        // Set up player data
+        File playerData = new File(getDataFolder(), "playerData");
+        if (!playerData.exists()) {
+            if (!playerData.mkdirs()) {
+                logger.severe("ASW failed to create player data directory. Might be permissions issue?");
+                getServer().getPluginManager().disablePlugin(this);
+                return;
+            }
+        }
+
+        // Load Vault
+        if (getServer().getServicesManager().getRegistration(Chat.class) != null) {
+            chat = getServer().getServicesManager().getRegistration(Chat.class).getProvider();
+        } else {
+            logger.severe("ASW requires vault-compatible permission plugin serving chats.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        // Register commands
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("brigadier");
         manager.registerCommand(new SceneTestCommand());
+
+        // Register listeners
+        new CameraListener();
 
         logger.info("Hello, a small world!\nSuccessfully enabled ASW.");
     }
