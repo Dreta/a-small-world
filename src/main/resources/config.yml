@@ -18,4 +18,4 @@
 
 # The block type of the walls of scenes. See https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
 # for a list of possible block types.
-wall: BROWN_CONCRETE
+wall: BROWN_TERRACOTTA

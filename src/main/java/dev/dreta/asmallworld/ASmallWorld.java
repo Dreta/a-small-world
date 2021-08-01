@@ -18,6 +18,8 @@
 
 package dev.dreta.asmallworld;
 
+import co.aikar.commands.PaperCommandManager;
+import dev.dreta.asmallworld.test.SceneTestCommand;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,7 +31,7 @@ public final class ASmallWorld extends JavaPlugin {
     private static ASmallWorld inst;
 
     @Getter
-    public Configuration config;
+    public Configuration conf;
 
     public ASmallWorld() {
         inst = this;
@@ -43,7 +45,11 @@ public final class ASmallWorld extends JavaPlugin {
     public void onEnable() {
         logger = Logger.getLogger("Minecraft");
 
-        config = Configuration.loadConfiguration("config.yml");
+        conf = Configuration.loadConfiguration("config.yml");
+
+        PaperCommandManager manager = new PaperCommandManager(this);
+        manager.enableUnstableAPI("brigadier");
+        manager.registerCommand(new SceneTestCommand());
 
         logger.info("Hello, a small world!\nSuccessfully enabled ASW.");
     }
