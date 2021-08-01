@@ -18,6 +18,8 @@
 
 package dev.dreta.asmallworld;
 
+import dev.dreta.asmallworld.utils.configuration.Configuration;
+import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
@@ -25,6 +27,9 @@ import java.util.logging.Logger;
 public final class ASmallWorld extends JavaPlugin {
     public static Logger logger;
     private static ASmallWorld inst;
+
+    @Getter
+    public Configuration config;
 
     public ASmallWorld() {
         inst = this;
@@ -37,11 +42,14 @@ public final class ASmallWorld extends JavaPlugin {
     @Override
     public void onEnable() {
         logger = Logger.getLogger("Minecraft");
-        logger.info("Hello, world!");
+
+        config = Configuration.loadConfiguration("config.yml");
+
+        logger.info("Hello, a small world!\nSuccessfully enabled ASW.");
     }
 
     @Override
     public void onDisable() {
-        logger.info("Goodbye, world!");
+        logger.info("Goodbye, small world!\nASW is now disabled.");
     }
 }
