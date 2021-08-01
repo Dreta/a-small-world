@@ -58,6 +58,9 @@ public class Scene implements ConfigurationSerializable {
     public static final int FULL_WIDTH = WIDTH + 5;
     public static final int HEIGHT = 34;
 
+    @Getter
+    private final int id;
+
     /**
      * The world that this scene is in.
      */
@@ -89,6 +92,15 @@ public class Scene implements ConfigurationSerializable {
     private final int z;
 
     public Scene(World world, int x, int y, int z) {
+        this.id = ASmallWorld.inst().getData().getScenes().keySet().stream().max(Integer::compareTo).get() + 1;
+        this.world = world;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    private Scene(int id, World world, int x, int y, int z) {
+        this.id = id;
         this.world = world;
         this.x = x;
         this.y = y;
@@ -96,7 +108,7 @@ public class Scene implements ConfigurationSerializable {
     }
 
     public static Scene deserialize(Map<String, Object> map) {
-        return new Scene(Bukkit.getWorld(UUID.fromString((String) map.get("world"))), (int) map.get("x"), (int) map.get("y"), (int) map.get("z"));
+        return new Scene((int) map.get("id"), Bukkit.getWorld(UUID.fromString((String) map.get("world"))), (int) map.get("x"), (int) map.get("y"), (int) map.get("z"));
     }
 
     /**

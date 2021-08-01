@@ -19,6 +19,7 @@
 package dev.dreta.asmallworld;
 
 import co.aikar.commands.PaperCommandManager;
+import dev.dreta.asmallworld.data.DataStore;
 import dev.dreta.asmallworld.test.SceneTestCommand;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
@@ -31,7 +32,9 @@ public final class ASmallWorld extends JavaPlugin {
     private static ASmallWorld inst;
 
     @Getter
-    public Configuration conf;
+    private Configuration conf;
+    @Getter
+    private DataStore data;
 
     public ASmallWorld() {
         inst = this;
@@ -46,6 +49,7 @@ public final class ASmallWorld extends JavaPlugin {
         logger = Logger.getLogger("Minecraft");
 
         conf = Configuration.loadConfiguration("config.yml");
+        data = new DataStore();
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("brigadier");
@@ -56,6 +60,7 @@ public final class ASmallWorld extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        data.saveScenes();
         logger.info("Goodbye, small world!\nASW is now disabled.");
     }
 }
