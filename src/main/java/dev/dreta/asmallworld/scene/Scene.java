@@ -27,6 +27,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -44,8 +45,8 @@ import java.util.UUID;
  * will represent them in the scene.
  * <p>
  * The player will be able to control their characters to
- * pass through the specified doors to enter the scene that's
- * linked to the door.
+ * pass through the specified portal to enter the scene that's
+ * linked to the portal.
  * <p>
  * The thickness of the wall of each scene is 2 blocks.
  * <p>
@@ -60,6 +61,14 @@ public class Scene implements ConfigurationSerializable {
 
     @Getter
     private final int id;
+
+    /**
+     * The name of this scene. Shown in the subtitle
+     * area when teleporting to this scene if enabled in
+     * the {@link Portal}.
+     */
+    @Getter
+    private final String name;
 
     /**
      * The world that this scene is in.
@@ -91,31 +100,37 @@ public class Scene implements ConfigurationSerializable {
     @Getter
     private final int z;
 
-    public Scene(World world, int x, int y, int z) {
-        this.id = ASmallWorld.inst().getData().getScenes().keySet().stream().max(Integer::compareTo).get() + 1;
-        this.world = world;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    /**
+     * The portals within this scene.
+     */
+    @Getter
+    private final List<Portal> portals;
+
+    public Scene(String name, World world, int x, int y, int z, List<Portal> portals) {
+        this(ASmallWorld.inst().getData().getScenes().keySet().stream().max(Integer::compareTo).get() + 1, name, world, x, y, z, portals);
     }
 
-    private Scene(int id, World world, int x, int y, int z) {
+    private Scene(int id, String name, World world, int x, int y, int z, List<Portal> portals) {
         this.id = id;
+        this.name = name;
         this.world = world;
         this.x = x;
         this.y = y;
         this.z = z;
+        this.portals = portals;
     }
 
     public static Scene deserialize(Map<String, Object> map) {
-        return new Scene((int) map.get("id"), Bukkit.getWorld(UUID.fromString((String) map.get("world"))), (int) map.get("x"), (int) map.get("y"), (int) map.get("z"));
+        return new Scene((int) map.get("id"), (String) map.get("name"),
+                Bukkit.getWorld(UUID.fromString((String) map.get("world"))),
+                (int) map.get("x"), (int) map.get("y"), (int) map.get("z"), (List<Portal>) map.get("portals"));
     }
 
     /**
      * Generate the walls of this scene.
      */
     public void generateWalls() {
-        Material type = Material.valueOf(ASmallWorld.inst().getConf().getString("wall"));
+        Material type = Material.valueOf(ASmallWorld.inst().getConf().getString("scene.wall"));
 
         // Left wall
         for (int z = this.z; z <= this.z + FULL_WIDTH + 2; z++) {
@@ -177,11 +192,12 @@ public class Scene implements ConfigurationSerializable {
      * @param player The player to teleport
      */
     public void teleportPlayer(Player player) {
+        // TODO Teleport the player's associated entity as well
         player.teleport(new Location(world, x + 12 + 0.5, y + HEIGHT - 2, z + FULL_WIDTH + 0.5, 180, 50));
     }
 
     @Override
     public Map<String, Object> serialize() {
-        return Map.of("world", world.getUID().toString(), "x", x, "y", y, "z", z);
+        return Map.of("id", id, "world", world.getUID().toString(), "x", x, "y", y, "z", z, "portals", portals);
     }
 }

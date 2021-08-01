@@ -25,6 +25,8 @@ import co.aikar.commands.annotation.Default;
 import dev.dreta.asmallworld.scene.Scene;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
+
 /**
  * This command allows a tester to test all the features
  * of {@link dev.dreta.asmallworld.scene.Scene}.
@@ -34,7 +36,7 @@ import org.bukkit.entity.Player;
 public class SceneTestCommand extends BaseCommand {
     @Default
     public void test(Player player) {
-        Scene scene = new Scene(player.getWorld(), player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ());
+        Scene scene = new Scene("Test", player.getWorld(), player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ(), Collections.emptyList());
         scene.generateWalls();
         scene.generatePlayerArea();
         scene.teleportPlayer(player);

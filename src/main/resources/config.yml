@@ -16,6 +16,32 @@
 # along with A Small World.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# The block type of the walls of scenes. See https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
-# for a list of possible block types.
-wall: BROWN_TERRACOTTA
+# Configuration related to scenes.
+scene:
+  # The block type of the walls of scenes. See https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  # for a list of possible block types.
+  wall: BROWN_TERRACOTTA
+
+  # Configuration related to portals.
+  portal:
+    # Delay before teleporting the player after they've
+    # stepped on the portal, in milliseconds.
+    delay: 500
+
+    # Before reaching the final location, the player can be
+    # teleported into a "load screen" where information about
+    # the destination can be displayed. You can configure whether
+    # to enable the load screen for each individual portals.
+    load-screen:
+      # How long the load screen should last.
+      duration: 500
+
+      # When the player is on the load screen, titles can be
+      # displayed showing the information about the destination.
+      # You can configure them here.
+      #
+      # Available placeholders: TBD
+      title:
+        title: ""
+        subtitle: ""
+        actionbar: ""

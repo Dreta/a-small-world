@@ -19,6 +19,7 @@
 package dev.dreta.asmallworld.data;
 
 import dev.dreta.asmallworld.ASmallWorld;
+import dev.dreta.asmallworld.scene.Portal;
 import dev.dreta.asmallworld.scene.Scene;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
@@ -35,6 +36,8 @@ import java.util.Map;
 public class DataStore extends Configuration {
     @Getter
     private final Map<Integer, Scene> scenes = new HashMap<>();
+    @Getter
+    private final Map<Integer, Portal> portals = new HashMap<>();
 
     public DataStore() {
         this.load("data.yml");
@@ -50,6 +53,9 @@ public class DataStore extends Configuration {
         scenes.clear();
         for (Object scene : getList("scenes", Collections.emptyList())) {
             scenes.put(((Scene) scene).getId(), (Scene) scene);
+            for (Portal portal : ((Scene) scene).getPortals()) {
+                portals.put(portal.getId(), portal);
+            }
         }
     }
 
