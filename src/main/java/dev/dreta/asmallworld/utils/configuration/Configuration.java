@@ -18,12 +18,12 @@
 
 package dev.dreta.asmallworld.utils.configuration;
 
-import com.google.gson.JsonObject;
 import dev.dreta.asmallworld.ASmallWorld;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Color;
@@ -37,6 +37,7 @@ import org.bukkit.util.Vector;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class Configuration {
     @Getter
@@ -290,12 +291,13 @@ public class Configuration {
         return config.getConfigurationSection(path);
     }
 
-    public Component getComponent(String path) {
+    public Component getComponent(String path, Object... placeholders) {
         if (!config.contains(path)) {
             return null;
         }
+        Component component = null;
         if (config.isString(path)) {
-            return LegacyComponentSerializer.legacyAmpersand().deserialize(config.getString(path)
+            component = LegacyComponentSerializer.legacyAmpersand().deserialize(config.getString(path)
                     .replace(LegacyComponentSerializer.SECTION_CHAR, LegacyComponentSerializer.AMPERSAND_CHAR));
         }
         if (config.isList(path)) {
@@ -309,15 +311,42 @@ public class Configuration {
                     components.add(LegacyComponentSerializer.legacyAmpersand().deserialize(config.getString(path)
                             .replace(LegacyComponentSerializer.SECTION_CHAR, LegacyComponentSerializer.AMPERSAND_CHAR)));
                 } else if (o instanceof Map) {
-                    components.add(getSingleComponent((Map<String, Object>) o));
+                    components.add(getSingleComponent((Map<String, Object>) o, placeholders));
                 }
             }
-            return Component.join(Component.empty(), components);
+            component = Component.join(Component.empty(), components);
         }
         if (config.isConfigurationSection(path)) {
-            return getSingleComponent(config.getConfigurationSection(path).getValues(true));
+            component = getSingleComponent(config.getConfigurationSection(path).getValues(true), placeholders);
         }
-        return null;
+        if (component == null) {
+            return null;
+        }
+
+        if (placeholders.length % 2 != 0) {
+            throw new IllegalArgumentException("Mismatched placeholder key/value pair.");
+        }
+        String key = null;
+        for (int i = 0; i < placeholders.length; i++) {
+            if (i % 2 == 0) {
+                key = (String) placeholders[i];
+            } else {
+                if (placeholders[i] instanceof String) {
+                    component = component.replaceText(TextReplacementConfig.builder()
+                            .match(Pattern.quote(key))
+                            .replacement((String) placeholders[i]).build());
+                } else if (placeholders[i] instanceof Component) {
+                    component = component.replaceText(TextReplacementConfig.builder()
+                            .match(Pattern.quote(key))
+                            .replacement((Component) placeholders[i]).build());
+                } else {
+                    component = component.replaceText(TextReplacementConfig.builder()
+                            .match(Pattern.quote(key))
+                            .replacement(placeholders[i].toString()).build());
+                }
+            }
+        }
+        return component;
     }
 
     private Map<String, Object> sanitizeValuesMap(Map<String, Object> map) {
@@ -332,8 +361,26 @@ public class Configuration {
         return newMap;
     }
 
-    private Component getSingleComponent(Map<String, Object> map) {
-        JsonObject tree = ASmallWorld.gson.toJsonTree(sanitizeValuesMap(map)).getAsJsonObject();
-        return GsonComponentSerializer.gson().deserializeFromTree(tree);
+    private Component getSingleComponent(Map<String, Object> map, Object... placeholders) {
+        String s = ASmallWorld.gson.toJsonTree(sanitizeValuesMap(map)).toString();
+        if (placeholders.length % 2 != 0) {
+            throw new IllegalArgumentException("Mismatched placeholder key/value pair.");
+        }
+        // Because the replaceText method of Kyori Adventure only checks within
+        // the "text" field, we will replace all the occurrences of string placeholders
+        // ourselves first before having Kyori Adventure replace the other placeholders.
+        String key = null;
+        for (int i = 0; i < placeholders.length; i++) {
+            if (i % 2 == 0) {
+                key = (String) placeholders[i];
+            } else {
+                if (placeholders[i] instanceof String) {
+                    s = s.replace(key, (String) placeholders[i]);
+                } else if (!(placeholders[i] instanceof Component)) {
+                    s = s.replace(key, placeholders[i].toString());
+                }
+            }
+        }
+        return GsonComponentSerializer.gson().deserialize(s);
     }
 }

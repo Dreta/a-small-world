@@ -1,0 +1,153 @@
+#
+# A Small World is a curated 2.5D Minecraft experience.
+# Copyright (C) 2021 Dreta / Gabriel Leen
+#
+# A Small World is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# A Small World is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with A Small World.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Message sent when ASW is reloaded.
+reloaded:
+  text: "Successfully reloaded A Small World."
+  color: "green"
+
+# Messages related to the command /aswscene.
+# Formatted as Minecraft chat components. See config.yml
+# for more examples.
+scene:
+  # Messages related to /aswscene create.
+  create:
+    # Sent before the building gets generated.
+    generation:
+      text: "Generating the scene. The server might experience lag."
+      color: "green"
+    # Sent after the scene is created.
+    # Available placeholders: {SCENE_NAME}, {SCENE_ID}, {SCENE_WORLD}
+    # {SCENE_X}, {SCENE_Y}, {SCENE_Z}
+    success:
+      - text: "Successfully created the scene "
+        color: "green"
+      - text: "{SCENE_NAME}"
+        color: "yellow"
+      - text: " (ID: "
+        color: "green"
+      - text: "{SCENE_ID}"
+        color: "yellow"
+      - text: ")."
+        color: "green"
+  # Messages related to /aswscene unregister.
+  unregister:
+    # Sent if ASW can't find a scene with the provided ID.
+    fail-dont-exist:
+      text: "This scene don't exist."
+      color: "red"
+    # Sent after the scene is unregistered.
+    # Available placeholders: {SCENE_NAME}, {SCENE_ID}.
+    success:
+      - text: "Successfully unregistered the scene "
+        color: "green"
+      - text: "{SCENE_NAME}"
+        color: "yellow"
+      - text: " (ID: "
+        color: "green"
+      - text: "{SCENE_ID}"
+        color: "yellow"
+      - text: "). You can now destroy the area."
+        color: "green"
+  # Messages related to /aswscene list.
+  list:
+    # Sent if there are no scenes.
+    fail-empty:
+      text: "There are no scenes."
+      color: "red"
+
+    # The formatting of each page of the list.
+    # Available placeholders: {SCENES}, {PAGE}, {TOTAL_PAGES}, {PREVIOUS_PAGE_ARROW}, {NEXT_PAGE_ARROW}, {PREVIOUS_PAGE}, {NEXT_PAGE}
+    # {SCENES} are a list of individual scenes. The format for each scene is configurable below.
+    # {PAGE} is the current page number.
+    # {TOTAL_PAGES} is the total amount of pages.
+    # {PREVIOUS_PAGE_ARROW} will be empty if this is the first page.
+    # {NEXT_PAGE_ARROW} will be empty if this is the last page.
+    # {PREVIOUS_PAGE} is the page number of the previous page, if applicable.
+    # {NEXT_PAGE} is the page number of the next page, if applicable.
+    page:
+      - text: "-------- [Scenes] --------\n"
+        color: "green"
+      - text: "Page "
+        color: "green"
+      - text: "{PAGE}"
+        color: "yellow"
+      - text: " of "
+        color: "green"
+      - text: "{TOTAL_PAGES}\n"
+        color: "yellow"
+      - text: "{SCENES}\n"
+      - text: "{PREVIOUS_PAGE_ARROW}"
+        color: "yellow"
+        hoverEvent:
+          action: "show_text"
+          value:
+            text: "Previous Page"
+        clickEvent:
+          action: "run_command"
+          value: "/aswscene list {PREVIOUS_PAGE}"
+      - text: "                         " # Separator
+      - text: "{NEXT_PAGE_ARROW}"
+        color: "yellow"
+        hoverEvent:
+          action: "show_text"
+          value:
+            text: "Next Page"
+        clickEvent:
+          action: "run_command"
+          value: "/aswscene list {NEXT_PAGE}"
+
+    # The formatting of each individual scene.
+    # Available placeholders: {SCENE_NAME}, {SCENE_ID}, {SCENE_WORLD}, {SCENE_X}, {SCENE_Y}, {SCENE_Z}
+    page-item:
+      - text: "{SCENE_NAME}"
+        color: "yellow"
+      - text: ": ID: "
+        color: "green"
+      - text: "{SCENE_ID}"
+        color: "yellow"
+      - text: "   Location: "
+        color: "green"
+      - text: "({SCENE_WORLD}, {SCENE_X}, {SCENE_Y}, {SCENE_Z})"
+        color: "yellow"
+  # Messages related to /aswscene teleport
+  teleport:
+    # Sent if ASW can't find a scene with the provided ID.
+    fail-dont-exist:
+      text: "This scene don't exist."
+      color: "red"
+    # Sent to the teleporter when teleportation of another player
+    # is successful.
+    #
+    # Available placeholders: {TARGET_NAME}, {TARGET_DISPLAY_NAME}, {TARGET_SCENE_NAME}
+    # {TARGET_NAME} is the raw name of the target player.
+    # {TARGET_DISPLAY_NAME} is the display name (prefix+name+suffix) of the target player.
+    success-other:
+      - text: "Successfully teleported "
+        color: "green"
+      - text: "{TARGET_DISPLAY_NAME}"
+        color: "yellow"
+      - text: " to "
+        color: "green"
+      - text: "{TARGET_SCENE_NAME}"
+        color: "yellow"
+      - text: "."
+        color: "green"
+    # No messages will be sent if the teleportation is successful,
+    # as this command will be used for teleportation with external
+    # signs, etc.

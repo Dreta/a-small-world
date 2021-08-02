@@ -16,13 +16,13 @@
  * along with A Small World.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreta.asmallworld.scene;
+package dev.dreta.asmallworld.scene.portal;
 
 import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.player.Camera;
+import dev.dreta.asmallworld.scene.Scene;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
@@ -112,10 +112,10 @@ public class Portal {
                         camera.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 10, false, false, false));
                         // TODO Placeholders
                         camera.getPlayer().showTitle(Title.title(
-                                replacePlaceholders(ASmallWorld.inst().getConf().getComponent("scene.portal.load-screen.title.title"), camera),
-                                replacePlaceholders(ASmallWorld.inst().getConf().getComponent("scene.portal.load-screen.title.subtitle"), camera),
+                                replacePlaceholders("scene.portal.load-screen.title.title", camera),
+                                replacePlaceholders("scene.portal.load-screen.title.subtitle", camera),
                                 Title.Times.of(Ticks.duration(0), Ticks.duration(999999), Ticks.duration(0))));
-                        camera.getPlayer().sendActionBar(replacePlaceholders(ASmallWorld.inst().getConf().getComponent("scene.portal.load-screen.title.actionbar"), camera));
+                        camera.getPlayer().sendActionBar(replacePlaceholders("scene.portal.load-screen.title.actionbar", camera));
                         Bukkit.getScheduler().runTaskLater(ASmallWorld.inst(), () -> {
                             camera.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
                             camera.getPlayer().clearTitle();
@@ -127,13 +127,11 @@ public class Portal {
                 }, ASmallWorld.inst().getConf().getInt("scene.portal.delay") / 1000 * 20));
     }
 
-    private Component replacePlaceholders(Component comp, Camera camera) {
-        return comp.replaceText(TextReplacementConfig.builder()
-                .match("{NAME}").replacement(camera.getName()).build())
-                .replaceText(TextReplacementConfig.builder()
-                        .match("{DISPLAY_NAME}").replacement(camera.getDisplayName()).build())
-                .replaceText(TextReplacementConfig.builder()
-                        .match("{TARGET_NAME}").replacement(getTarget().getName()).build());
+    private Component replacePlaceholders(String path, Camera camera) {
+        return ASmallWorld.inst().getConf().getComponent(path,
+                "{NAME}", camera.getName(),
+                "{DISPLAY_NAME}", camera.getDisplayName(),
+                "{TARGET_NAME}", getTarget().getName());
     }
 
     /**

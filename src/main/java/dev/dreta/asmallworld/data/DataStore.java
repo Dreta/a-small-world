@@ -19,8 +19,8 @@
 package dev.dreta.asmallworld.data;
 
 import dev.dreta.asmallworld.ASmallWorld;
-import dev.dreta.asmallworld.scene.Portal;
 import dev.dreta.asmallworld.scene.Scene;
+import dev.dreta.asmallworld.scene.portal.Portal;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -64,7 +64,9 @@ public class DataStore extends Configuration {
         set("scenes", new ArrayList<>(scenes.values()));
     }
 
+    @Override
     public void save() {
         saveScenes();
+        super.save();
     }
 }

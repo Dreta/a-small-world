@@ -21,10 +21,14 @@ package dev.dreta.asmallworld;
 import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import dev.dreta.asmallworld.data.DataStore;
+import dev.dreta.asmallworld.misc.ReloadCommand;
 import dev.dreta.asmallworld.player.CameraListener;
+import dev.dreta.asmallworld.scene.Scene;
+import dev.dreta.asmallworld.scene.SceneCommand;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -38,6 +42,8 @@ public final class ASmallWorld extends JavaPlugin {
 
     @Getter
     private Configuration conf;
+    @Getter
+    private Configuration msg;
     @Getter
     private DataStore data;
 
@@ -64,13 +70,16 @@ public final class ASmallWorld extends JavaPlugin {
         }
 
         if (!getServer().getPluginManager().isPluginEnabled("ProtocolLib")) {
-            logger.severe("ASW requires ProtocolLib to properly function. Please install Vault before continuing.");
+            logger.severe("ASW requires ProtocolLib to properly function. Please install ProtocolLib before continuing.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         // Load configuration and data
+        ConfigurationSerialization.registerClass(Scene.class);
+
         conf = Configuration.loadConfiguration("config.yml");
+        msg = Configuration.loadConfiguration("messages.yml");
         data = new DataStore();
 
         // Set up player data
@@ -95,6 +104,8 @@ public final class ASmallWorld extends JavaPlugin {
         // Register commands
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("brigadier");
+        manager.registerCommand(new ReloadCommand());
+        manager.registerCommand(new SceneCommand());
 
         // Register listeners
         new CameraListener();

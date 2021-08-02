@@ -20,6 +20,7 @@ package dev.dreta.asmallworld.scene;
 
 import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.player.Camera;
+import dev.dreta.asmallworld.scene.portal.Portal;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -114,7 +115,8 @@ public class Scene implements ConfigurationSerializable {
     private final List<UUID> cameras = new ArrayList<>();
 
     public Scene(String name, World world, int x, int y, int z, List<Portal> portals) {
-        this(ASmallWorld.inst().getData().getScenes().keySet().stream().max(Integer::compareTo).get() + 1, name, world, x, y, z, portals);
+        this(ASmallWorld.inst().getData().getScenes().isEmpty() ? 0 :
+                ASmallWorld.inst().getData().getScenes().keySet().stream().max(Integer::compareTo).get() + 1, name, world, x, y, z, portals);
     }
 
     private Scene(int id, String name, World world, int x, int y, int z, List<Portal> portals) {
@@ -206,6 +208,6 @@ public class Scene implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        return Map.of("id", id, "world", world.getUID().toString(), "x", x, "y", y, "z", z, "portals", portals);
+        return Map.of("id", id, "name", name, "world", world.getUID().toString(), "x", x, "y", y, "z", z, "portals", portals);
     }
 }
