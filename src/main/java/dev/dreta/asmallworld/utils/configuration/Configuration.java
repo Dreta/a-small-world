@@ -18,10 +18,14 @@
 
 package dev.dreta.asmallworld.utils.configuration;
 
+import com.google.gson.JsonObject;
 import dev.dreta.asmallworld.ASmallWorld;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -32,9 +36,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.io.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Configuration {
     @Getter
@@ -286,5 +288,52 @@ public class Configuration {
 
     public ConfigurationSection getSection(String path) {
         return config.getConfigurationSection(path);
+    }
+
+    public Component getComponent(String path) {
+        if (!config.contains(path)) {
+            return null;
+        }
+        if (config.isString(path)) {
+            return LegacyComponentSerializer.legacyAmpersand().deserialize(config.getString(path)
+                    .replace(LegacyComponentSerializer.SECTION_CHAR, LegacyComponentSerializer.AMPERSAND_CHAR));
+        }
+        if (config.isList(path)) {
+            List<?> list = config.getList(path);
+            if (list.isEmpty()) {
+                return Component.empty();
+            }
+            List<Component> components = new ArrayList<>();
+            for (Object o : list) {
+                if (o instanceof String) {
+                    components.add(LegacyComponentSerializer.legacyAmpersand().deserialize(config.getString(path)
+                            .replace(LegacyComponentSerializer.SECTION_CHAR, LegacyComponentSerializer.AMPERSAND_CHAR)));
+                } else if (o instanceof Map) {
+                    components.add(getSingleComponent((Map<String, Object>) o));
+                }
+            }
+            return Component.join(Component.empty(), components);
+        }
+        if (config.isConfigurationSection(path)) {
+            return getSingleComponent(config.getConfigurationSection(path).getValues(true));
+        }
+        return null;
+    }
+
+    private Map<String, Object> sanitizeValuesMap(Map<String, Object> map) {
+        Map<String, Object> newMap = new HashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (entry.getValue() instanceof ConfigurationSection) {
+                newMap.put(entry.getKey(), sanitizeValuesMap(((ConfigurationSection) entry.getValue()).getValues(true)));
+            } else {
+                newMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return newMap;
+    }
+
+    private Component getSingleComponent(Map<String, Object> map) {
+        JsonObject tree = ASmallWorld.gson.toJsonTree(sanitizeValuesMap(map)).getAsJsonObject();
+        return GsonComponentSerializer.gson().deserializeFromTree(tree);
     }
 }

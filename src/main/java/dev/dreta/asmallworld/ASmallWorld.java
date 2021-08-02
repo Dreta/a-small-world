@@ -19,9 +19,9 @@
 package dev.dreta.asmallworld;
 
 import co.aikar.commands.PaperCommandManager;
+import com.google.gson.Gson;
 import dev.dreta.asmallworld.data.DataStore;
 import dev.dreta.asmallworld.player.CameraListener;
-import dev.dreta.asmallworld.test.SceneTestCommand;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
@@ -33,6 +33,8 @@ import java.util.logging.Logger;
 public final class ASmallWorld extends JavaPlugin {
     public static Logger logger;
     private static ASmallWorld inst;
+
+    public static final Gson gson = new Gson();
 
     @Getter
     private Configuration conf;
@@ -93,7 +95,6 @@ public final class ASmallWorld extends JavaPlugin {
         // Register commands
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("brigadier");
-        manager.registerCommand(new SceneTestCommand());
 
         // Register listeners
         new CameraListener();

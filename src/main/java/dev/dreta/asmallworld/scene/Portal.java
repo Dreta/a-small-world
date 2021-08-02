@@ -22,6 +22,7 @@ import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.player.Camera;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
@@ -110,9 +111,11 @@ public class Portal {
                     if (useLoadScreen) {
                         camera.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 10, false, false, false));
                         // TODO Placeholders
-                        camera.getPlayer().showTitle(Title.title(Component.text(ASmallWorld.inst().getConf().getString("scene.portal.load-screen.title.title")),
-                                Component.text(ASmallWorld.inst().getConf().getString("scene.portal.load-screen.title.subtitle")), Title.Times.of(Ticks.duration(0), Ticks.duration(999999), Ticks.duration(0))));
-                        camera.getPlayer().sendActionBar(Component.text(ASmallWorld.inst().getConf().getString("scene.portal.load-screen.title.actionbar")));
+                        camera.getPlayer().showTitle(Title.title(
+                                replacePlaceholders(ASmallWorld.inst().getConf().getComponent("scene.portal.load-screen.title.title"), camera),
+                                replacePlaceholders(ASmallWorld.inst().getConf().getComponent("scene.portal.load-screen.title.subtitle"), camera),
+                                Title.Times.of(Ticks.duration(0), Ticks.duration(999999), Ticks.duration(0))));
+                        camera.getPlayer().sendActionBar(replacePlaceholders(ASmallWorld.inst().getConf().getComponent("scene.portal.load-screen.title.actionbar"), camera));
                         Bukkit.getScheduler().runTaskLater(ASmallWorld.inst(), () -> {
                             camera.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
                             camera.getPlayer().clearTitle();
@@ -122,6 +125,15 @@ public class Portal {
                         getTarget().teleportPlayer(camera);
                     }
                 }, ASmallWorld.inst().getConf().getInt("scene.portal.delay") / 1000 * 20));
+    }
+
+    private Component replacePlaceholders(Component comp, Camera camera) {
+        return comp.replaceText(TextReplacementConfig.builder()
+                .match("{NAME}").replacement(camera.getName()).build())
+                .replaceText(TextReplacementConfig.builder()
+                        .match("{DISPLAY_NAME}").replacement(camera.getDisplayName()).build())
+                .replaceText(TextReplacementConfig.builder()
+                        .match("{TARGET_NAME}").replacement(getTarget().getName()).build());
     }
 
     /**

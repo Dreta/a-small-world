@@ -40,8 +40,48 @@ scene:
       # displayed showing the information about the destination.
       # You can configure them here.
       #
-      # Available placeholders: TBD
+      # The title, subtitle and actionbar are formatted as Minecraft
+      # chat components. You still use legacy string formatting with
+      # &-colors, but with the new components system, you can create
+      # fancy effects like custom RGB color, custom fonts and
+      # click/hover effects. For examples, see [ct1], [ct2] and [ct3]
+      # below.
+      #
+      # Available placeholders:
+      # * {NAME}: The raw name of the player
+      # * {DISPLAY_NAME}: The display name of the player (prefix+name+suffix)
+      # * {TARGET_NAME}: The name of the target scene
       title:
-        title: ""
-        subtitle: ""
-        actionbar: ""
+        title:
+          text: ""
+        subtitle:
+          text: ""
+        actionbar:
+          text: ""
+
+# This is a demo chat component that says "Hello, world!"
+# with a custom RGB color.
+ct1:
+  text: "Hello, world!"
+  color: "#abcdef"
+
+# This is a demo chat component that says "Hello, world!",
+# opens a website when clicked, and shows "Hi!" when hovered over.
+ct2:
+  text: "Hello, world!"
+  clickEvent:
+    action: "open_url"
+    value: "https://example.org"
+  hoverEvent:
+    action: "show_text"
+    value:
+      text: "Hi!"
+      color: "#abcdef"
+
+# This is a demo chat component with multiple components within
+# it.
+ct3:
+  - text: "Hello, "
+    color: "#00bbff"
+  - text: "world!"
+    color: "#ffeb0f"
