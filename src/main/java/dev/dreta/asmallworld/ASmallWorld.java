@@ -26,6 +26,7 @@ import dev.dreta.asmallworld.player.CameraListener;
 import dev.dreta.asmallworld.scene.Scene;
 import dev.dreta.asmallworld.scene.SceneCommand;
 import dev.dreta.asmallworld.scene.SceneIDValidator;
+import dev.dreta.asmallworld.scene.portal.Portal;
 import dev.dreta.asmallworld.scene.portal.PortalCommand;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
@@ -79,6 +80,7 @@ public final class ASmallWorld extends JavaPlugin {
 
         // Load configuration and data
         ConfigurationSerialization.registerClass(Scene.class);
+        ConfigurationSerialization.registerClass(Portal.class);
 
         conf = Configuration.loadConfiguration("config.yml");
         msg = Configuration.loadConfiguration("messages.yml");
@@ -106,7 +108,8 @@ public final class ASmallWorld extends JavaPlugin {
         // Register commands
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("brigadier");
-        manager.getCommandConditions().addCondition(Integer.class, "sceneExist", new SceneIDValidator());
+        manager.getCommandConditions().addCondition(int.class, "sceneexist", new SceneIDValidator());
+        manager.getCommandConditions().addCondition(Integer.class, "sceneexist", new SceneIDValidator());
         manager.registerCommand(new ReloadCommand());
         manager.registerCommand(new SceneCommand());
         manager.registerCommand(new PortalCommand());

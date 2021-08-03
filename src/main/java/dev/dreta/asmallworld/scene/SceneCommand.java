@@ -63,7 +63,7 @@ public class SceneCommand extends BaseCommand {
     @Subcommand("unregister")
     @CommandPermission("asw.scene.manage")
     @Description("Unregisters a scene.")
-    public void unregister(CommandSender sender, @Conditions("sceneExist") int id) {
+    public void unregister(CommandSender sender, @Conditions("sceneexist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().remove(id);
         ASmallWorld.inst().getData().save();
         sender.sendMessage(
@@ -111,7 +111,7 @@ public class SceneCommand extends BaseCommand {
 
     @Subcommand("teleport")
     @Description("Teleports yourself to a scene.")
-    public void teleport(Player player, @Conditions("sceneExist") int id) {
+    public void teleport(Player player, @Conditions("sceneexist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(id);
         Camera camera = Camera.getCamera(player);
         camera.setScene(scene);
@@ -121,7 +121,7 @@ public class SceneCommand extends BaseCommand {
     @Subcommand("teleport")
     @CommandPermission("asw.scene.manage")
     @Description("Teleports another player to a scene.")
-    public void teleport(CommandSender sender, Player target, @Conditions("sceneExist") int id) {
+    public void teleport(CommandSender sender, Player target, @Conditions("sceneexist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(id);
         Camera camera = Camera.getCamera(target);
         camera.setScene(scene);

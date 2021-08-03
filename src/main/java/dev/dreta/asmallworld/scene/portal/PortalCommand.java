@@ -39,9 +39,10 @@ public class PortalCommand extends BaseCommand {
 
     private static final int PAGE_ITEM_AMOUNT = 5;
 
+    // TODO Add sub command to cancel creation
     @Subcommand("create")
     @Description("Creates a portal at your current location.")
-    public void create(Player player, @Conditions("sceneExist") int sourceScene, @Conditions("sceneExist") int targetScene) {
+    public void create(Player player, @Conditions("sceneexist") int sourceScene, @Conditions("sceneexist") int targetScene) {
         Scene source = ASmallWorld.inst().getData().getScenes().get(sourceScene);
         Scene target = ASmallWorld.inst().getData().getScenes().get(targetScene);
         if (creating.containsKey(player.getUniqueId())) {
@@ -56,6 +57,7 @@ public class PortalCommand extends BaseCommand {
             synchronized (Portal.createLock) {
                 Portal portal = new Portal(sourceScene, new ArrayList<>(Collections.singletonList(sourceLoc)), targetScene, targetLoc, false);
                 source.getPortals().put(portal.getId(), portal);
+                ASmallWorld.inst().getData().getPortals().put(portal.getId(), portal);
                 ASmallWorld.inst().getData().save();
                 player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.create.success",
                         "{ID}", portal.getId(),
@@ -86,7 +88,7 @@ public class PortalCommand extends BaseCommand {
 
     @Subcommand("unregister")
     @Description("Unregisters a portal within a scene.")
-    public void unregister(CommandSender sender, @Conditions("sceneExist") int sceneID, int portalID) {
+    public void unregister(CommandSender sender, @Conditions("sceneexist") int sceneID, int portalID) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
         if (!scene.getPortals().containsKey(portalID)) {
             sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.unregister.portal-dont-exist"));
@@ -102,16 +104,16 @@ public class PortalCommand extends BaseCommand {
 
     @Subcommand("list")
     @Description("Lists all available portals within a scene.")
-    public void list(CommandSender sender, @Conditions("sceneExist") int sceneID) {
+    public void list(CommandSender sender, @Conditions("sceneexist") int sceneID) {
         list(sender, 1, sceneID);
     }
 
     @Subcommand("list")
     @Description("Lists all available portals at a specific page.")
-    public void list(CommandSender sender, int page, @Conditions("sceneExist") int sceneID) {
+    public void list(CommandSender sender, int page, @Conditions("sceneexist") int sceneID) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
         if (scene.getPortals().isEmpty()) {
-            sender.sendMessage("portal.list.fail-empty");
+            sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.list.fail-empty"));
             return;
         }
         List<Portal> portals = scene.getPortals().values().stream().sorted(Comparator.comparingInt(Portal::getId)).collect(Collectors.toList());

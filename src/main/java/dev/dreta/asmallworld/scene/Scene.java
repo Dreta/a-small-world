@@ -142,12 +142,22 @@ public class Scene implements ConfigurationSerializable {
     }
 
     /**
-     * Check if a location is within this scene.
+     * Check if a location is within this scene, not including
+     * the blocking area.
      */
     public boolean contains(Location loc) {
         return loc.getBlockX() >= x && loc.getBlockX() <= x + LENGTH &&
                 loc.getBlockY() >= y && loc.getBlockY() <= y + HEIGHT &&
-                loc.getBlockZ() >= z && loc.getBlockZ() <= FULL_WIDTH;
+                loc.getBlockZ() >= z && loc.getBlockZ() <= z + WIDTH;
+    }
+
+    /**
+     * Check if a location is within the entire scene.
+     */
+    public boolean containsFull(Location loc) {
+        return loc.getBlockX() >= x && loc.getBlockX() <= x + LENGTH &&
+                loc.getBlockY() >= y && loc.getBlockY() <= y + HEIGHT &&
+                loc.getBlockZ() >= z && loc.getBlockZ() <= z + FULL_WIDTH;
     }
 
     /**

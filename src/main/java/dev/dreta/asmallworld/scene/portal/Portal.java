@@ -27,9 +27,11 @@ import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +48,7 @@ import java.util.Map;
  * blocks, the player and the NPC will be teleported to the
  * specified location in a different scene.
  */
-public class Portal {
+public class Portal implements ConfigurationSerializable {
     // To prevent a race condition (two portals created at the same time
     // may have the same ID), you should use this lock when creating a portal
     // from the construction of the portal up until you add this portal
@@ -91,7 +93,7 @@ public class Portal {
     private final Map<String, BukkitTask> tpTasks = new HashMap<>();
 
     public Portal(int scene, List<Location> blocks, int target, Location targetLocation, boolean useLoadScreen) {
-        this(ASmallWorld.inst().getData().getPortals().keySet().stream().max(Integer::compareTo).get() + 1,
+        this(ASmallWorld.inst().getData().getPortals().isEmpty() ? 0 : ASmallWorld.inst().getData().getPortals().keySet().stream().max(Integer::compareTo).get() + 1,
                 scene, blocks, target, targetLocation, useLoadScreen);
     }
 
@@ -102,6 +104,11 @@ public class Portal {
         this.target = target;
         this.targetLocation = targetLocation;
         this.useLoadScreen = useLoadScreen;
+    }
+
+    public static Portal deserialize(Map<String, Object> map) {
+        return new Portal((int) map.get("id"), (int) map.get("scene"), (List<Location>) map.get("blocks"), (int) map.get("target"),
+                (Location) map.get("targetLocation"), (boolean) map.get("useLoadScreen"));
     }
 
     /**
@@ -116,7 +123,6 @@ public class Portal {
                     tpTasks.remove(camera.getUniqueId().toString());
                     if (useLoadScreen) {
                         camera.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 10, false, false, false));
-                        // TODO Placeholders
                         camera.getPlayer().showTitle(Title.title(
                                 replacePlaceholders("scene.portal.load-screen.title.title", camera),
                                 replacePlaceholders("scene.portal.load-screen.title.subtitle", camera),
@@ -158,5 +164,10 @@ public class Portal {
 
     public Scene getTarget() {
         return ASmallWorld.inst().getData().getScenes().get(target);
+    }
+
+    @Override
+    public @NotNull Map<String, Object> serialize() {
+        return Map.of("id", id, "scene", scene, "blocks", blocks, "target", target, "targetLocation", targetLocation, "useLoadScreen", useLoadScreen);
     }
 }

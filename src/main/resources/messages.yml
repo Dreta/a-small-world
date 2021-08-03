@@ -160,7 +160,7 @@ portal:
     # Sent if the player is not in the target scene that they
     # specified.
     not-in-target-scene:
-      text: "You are not in the target scene that you specified."
+      text: "You are not in the target scene that you specified. Please start over."
       color: "red"
     # Sent to the player after they started to create a portal,
     # asking them to go to the target location.
@@ -179,6 +179,8 @@ portal:
         clickEvent:
           action: "run_command"
           value: "/aswportal create {SOURCE} {TARGET}"
+      - text: "."
+        color: "green"
     # Sent when the portal is successfully created.
     # Available placeholders: {ID}, {SOURCE_ID}, {SOURCE_NAME}, {SOURCE_X}, {SOURCE_Y}, {SOURCE_Z}, {TARGET_ID}, {TARGET_NAME}, {TARGET_X}, {TARGET_Y}, {TARGET_Z}
     # {ID} is the ID of this portal.
@@ -218,72 +220,72 @@ portal:
         color: "yellow"
       - text: "."
         color: "green"
-    # Messages related to /aswportal list.
-    list:
-      # Sent if there are no portals in this scene.
-      fail-empty:
-        text: "There are no portals in this scene."
-        color: "red"
+  # Messages related to /aswportal list.
+  list:
+    # Sent if there are no portals in this scene.
+    fail-empty:
+      text: "There are no portals in this scene."
+      color: "red"
 
-      # The formatting of each page of the list.
-      # Available placeholders: {PORTALS}, {SCENE_NAME}, {SCENE_ID}, {PAGE}, {TOTAL_PAGES}, {PREVIOUS_PAGE_ARROW}, {NEXT_PAGE_ARROW}, {PREVIOUS_PAGE}, {NEXT_PAGE}
-      # {PORTALS} is a list of individual portals. The format for each portal is configurable below. Includes a new line character at the end.
-      # {SCENE_NAME} is the name of the scene.
-      # {SCENE_ID} is the ID of the scene.
-      # {PAGE} is the current page number.
-      # {TOTAL_PAGES} is the total amount of pages.
-      # {PREVIOUS_PAGE_ARROW} will be empty if this is the first page.
-      # {NEXT_PAGE_ARROW} will be empty if this is the last page.
-      # {PREVIOUS_PAGE} is the page number of the previous page, if applicable.
-      # {NEXT_PAGE} is the page number of the next page, if applicable.
-      page:
-        - text: "-------- [Portals] --------\n"
-          color: "green"
-        - text: "Showing portals in "
-          color: "green"
-        - text: "{SCENE_NAME}\n"
-          color: "yellow"
-        - text: "Page "
-          color: "green"
-        - text: "{PAGE}"
-          color: "yellow"
-        - text: " of "
-          color: "green"
-        - text: "{TOTAL_PAGES}\n"
-          color: "yellow"
-        - text: "{PORTALS}"
-        - text: "Use "
-          color: "green"
-        - text: "/aswportal visualize <portal>"
-          color: "yellow"
-        - text: " to see where the portal is.\n"
-          color: "green"
-        - text: "{PREVIOUS_PAGE_ARROW}"
-          color: "yellow"
-          hoverEvent:
-            action: "show_text"
-            value:
-              text: "Previous Page"
-          clickEvent:
-            action: "run_command"
-            value: "/aswportal list {PREVIOUS_PAGE} {SCENE_ID}"
-        - text: "                         " # Separator
-        - text: "{NEXT_PAGE_ARROW}"
-          color: "yellow"
-          hoverEvent:
-            action: "show_text"
-            value:
-              text: "Next Page"
-          clickEvent:
-            action: "run_command"
-            value: "/aswportal list {NEXT_PAGE} {SCENE_ID}"
+    # The formatting of each page of the list.
+    # Available placeholders: {PORTALS}, {SCENE_NAME}, {SCENE_ID}, {PAGE}, {TOTAL_PAGES}, {PREVIOUS_PAGE_ARROW}, {NEXT_PAGE_ARROW}, {PREVIOUS_PAGE}, {NEXT_PAGE}
+    # {PORTALS} is a list of individual portals. The format for each portal is configurable below. Includes a new line character at the end.
+    # {SCENE_NAME} is the name of the scene.
+    # {SCENE_ID} is the ID of the scene.
+    # {PAGE} is the current page number.
+    # {TOTAL_PAGES} is the total amount of pages.
+    # {PREVIOUS_PAGE_ARROW} will be empty if this is the first page.
+    # {NEXT_PAGE_ARROW} will be empty if this is the last page.
+    # {PREVIOUS_PAGE} is the page number of the previous page, if applicable.
+    # {NEXT_PAGE} is the page number of the next page, if applicable.
+    page:
+      - text: "-------- [Portals] --------\n"
+        color: "green"
+      - text: "Showing portals in "
+        color: "green"
+      - text: "{SCENE_NAME}\n"
+        color: "yellow"
+      - text: "Page "
+        color: "green"
+      - text: "{PAGE}"
+        color: "yellow"
+      - text: " of "
+        color: "green"
+      - text: "{TOTAL_PAGES}\n"
+        color: "yellow"
+      - text: "{PORTALS}"
+      - text: "Use "
+        color: "green"
+      - text: "/aswportal visualize <portal>"
+        color: "yellow"
+      - text: " to see where the portal is.\n"
+        color: "green"
+      - text: "{PREVIOUS_PAGE_ARROW}"
+        color: "yellow"
+        hoverEvent:
+          action: "show_text"
+          value:
+            text: "Previous Page"
+        clickEvent:
+          action: "run_command"
+          value: "/aswportal list {PREVIOUS_PAGE} {SCENE_ID}"
+      - text: "                         " # Separator
+      - text: "{NEXT_PAGE_ARROW}"
+        color: "yellow"
+        hoverEvent:
+          action: "show_text"
+          value:
+            text: "Next Page"
+        clickEvent:
+          action: "run_command"
+          value: "/aswportal list {NEXT_PAGE} {SCENE_ID}"
 
       # The formatting of each individual portal.
       # Available placeholders: {ID}, {TARGET_SCENE_ID}, {TARGET_SCENE_NAME}, {TARGET_X}, {TARGET_Y}, {TARGET_Z}
-      page-item:
-        - text: "{ID}"
-          color: "yellow"
-        - text: ": Target: "
-          color: "green"
-        - text: "{TARGET_SCENE_ID} {TARGET_SCENE_NAME} ({TARGET_X}, {TARGET_Y}, {TARGET_Z})"
-          color: "yellow"
+    page-item:
+      - text: "{ID}"
+        color: "yellow"
+      - text: ": Target: "
+        color: "green"
+      - text: "{TARGET_SCENE_ID} {TARGET_SCENE_NAME} ({TARGET_X}, {TARGET_Y}, {TARGET_Z})"
+        color: "yellow"
