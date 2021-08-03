@@ -28,10 +28,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Scenes are the basic building blocks of ASW.
@@ -112,7 +109,7 @@ public class Scene implements ConfigurationSerializable {
      * The portals within this scene.
      */
     @Getter
-    private final List<Portal> portals;
+    private final Map<Integer, Portal> portals;
 
     /**
      * The cameras that are currently in this scene.
@@ -132,7 +129,10 @@ public class Scene implements ConfigurationSerializable {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.portals = portals;
+        this.portals = new HashMap<>();
+        for (Portal portal : portals) {
+            this.portals.put(portal.getId(), portal);
+        }
     }
 
     public static Scene deserialize(Map<String, Object> map) {
@@ -223,6 +223,6 @@ public class Scene implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        return Map.of("id", id, "name", name, "world", world.getUID().toString(), "x", x, "y", y, "z", z, "portals", portals);
+        return Map.of("id", id, "name", name, "world", world.getUID().toString(), "x", x, "y", y, "z", z, "portals", new ArrayList<>(portals.values()));
     }
 }

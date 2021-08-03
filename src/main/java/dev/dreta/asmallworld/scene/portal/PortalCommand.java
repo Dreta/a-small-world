@@ -22,6 +22,7 @@ import co.aikar.commands.annotation.*;
 import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.scene.Scene;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -49,7 +50,7 @@ public class PortalCommand {
             }
             synchronized (Portal.createLock) {
                 Portal portal = new Portal(sourceScene, new ArrayList<>(Collections.singletonList(sourceLoc)), targetScene, targetLoc, false);
-                source.getPortals().add(portal);
+                source.getPortals().put(portal.getId(), portal);
                 ASmallWorld.inst().getData().save();
                 player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.create.success",
                         "{ID}", portal.getId(),
@@ -76,5 +77,20 @@ public class PortalCommand {
         player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.create.go-to-target-scene",
                 "{SOURCE}", sourceScene,
                 "{TARGET}", targetScene));
+    }
+
+    @Subcommand("unregister")
+    @Description("Unregisters a portal within a scene.")
+    public void unregister(CommandSender sender, @Conditions("sceneExist") int sceneID, int portalID) {
+        Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
+        if (!scene.getPortals().containsKey(portalID)) {
+            sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.unregister.portal-dont-exist"));
+            return;
+        }
+        scene.getPortals().remove(portalID);
+        ASmallWorld.inst().getData().save();
+        sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.unregister.success",
+                "{ID}", portalID,
+                "{SCENE_ID}", sceneID));
     }
 }

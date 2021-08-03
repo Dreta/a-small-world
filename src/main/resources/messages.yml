@@ -199,3 +199,22 @@ portal:
         color: "yellow"
       - text: "."
         color: "green"
+  # Messages related to /aswportal unregister.
+  unregister:
+    # Sent if the portal don't exist.
+    portal-dont-exist:
+      text: "This portal don't exist."
+      color: "red"
+    # Sent when a portal is successfully unregistered.
+    # Available placeholders: {ID}, {SCENE_ID}
+    success:
+      - text: "Successfully unregistered the portal with ID "
+        color: "green"
+      - text: "{ID}"
+        color: "yellow"
+      - text: " in scene "
+        color: "green"
+      - text: "{SCENE_ID}"
+        color: "yellow"
+      - text: "."
+        color: "green"
