@@ -21,11 +21,13 @@ package dev.dreta.asmallworld.scene.portal;
 import co.aikar.commands.annotation.*;
 import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.scene.Scene;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @CommandAlias("aswportal")
 @CommandPermission("asw.portal")
@@ -33,6 +35,8 @@ public class PortalCommand {
     // The players that requested to create a scene, but haven't
     // specified the target location yet.
     private static final Map<UUID, Location> creating = new HashMap<>();
+
+    private static final int PAGE_ITEM_AMOUNT = 5;
 
     @Subcommand("create")
     @Description("Creates a portal at your current location.")
@@ -92,5 +96,43 @@ public class PortalCommand {
         sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.unregister.success",
                 "{ID}", portalID,
                 "{SCENE_ID}", sceneID));
+    }
+
+    @Subcommand("list")
+    @Description("Lists all available portals within a scene.")
+    public void list(CommandSender sender, @Conditions("sceneExist") int sceneID) {
+        list(sender, 1, sceneID);
+    }
+
+    @Subcommand("list")
+    @Description("Lists all available portals at a specific page.")
+    public void list(CommandSender sender, int page, @Conditions("sceneExist") int sceneID) {
+        Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
+        if (scene.getPortals().isEmpty()) {
+            sender.sendMessage("portal.list.fail-empty");
+            return;
+        }
+        List<Portal> portals = scene.getPortals().values().stream().sorted(Comparator.comparingInt(Portal::getId)).collect(Collectors.toList());
+        int total = (int) Math.ceil(portals.size() / (double) PAGE_ITEM_AMOUNT);
+        Component component = Component.empty();
+        for (Portal portal : portals.subList(PAGE_ITEM_AMOUNT * (page - 1), Math.min(portals.size(), PAGE_ITEM_AMOUNT * page))) {
+            component = component.append(ASmallWorld.inst().getMsg().getComponent("portal.list.page-item",
+                    "{ID}", portal.getId(),
+                    "{TARGET_SCENE_ID}", portal.getTarget().getId(),
+                    "{TARGET_SCENE_NAME}", portal.getTarget().getName(),
+                    "{TARGET_X}", portal.getTargetLocation().getBlockX(),
+                    "{TARGET_Y}", portal.getTargetLocation().getBlockY(),
+                    "{TARGET_Z}", portal.getTargetLocation().getBlockZ())).append(Component.text("\n"));
+        }
+        sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.list.page",
+                "{PORTALS}", component,
+                "{SCENE_NAME}", scene.getName(),
+                "{SCENE_ID}", sceneID,
+                "{PAGE}", page,
+                "{TOTAL_PAGES}", total,
+                "{PREVIOUS_PAGE_ARROW}", page == 1 ? "   " : "[<]",
+                "{NEXT_PAGE_ARROW}", page == total ? "   " : "[>]",
+                "{PREVIOUS_PAGE}", page - 1,
+                "{NEXT_PAGE}", page + 1));
     }
 }
