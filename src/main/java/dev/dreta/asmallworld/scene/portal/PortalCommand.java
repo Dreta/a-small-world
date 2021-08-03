@@ -18,10 +18,7 @@
 
 package dev.dreta.asmallworld.scene.portal;
 
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Description;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.scene.Scene;
 import org.bukkit.Location;
@@ -32,25 +29,15 @@ import java.util.*;
 @CommandAlias("aswportal")
 @CommandPermission("asw.portal")
 public class PortalCommand {
-    // TODO Refactor: Remove repeated "scene exist?" check.
-
     // The players that requested to create a scene, but haven't
     // specified the target location yet.
     private static final Map<UUID, Location> creating = new HashMap<>();
 
     @Subcommand("create")
     @Description("Creates a portal at your current location.")
-    public void create(Player player, int sourceScene, int targetScene) {
+    public void create(Player player, @Conditions("sceneExist") int sourceScene, @Conditions("sceneExist") int targetScene) {
         Scene source = ASmallWorld.inst().getData().getScenes().get(sourceScene);
-        if (source == null) {
-            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.create.fail-source-dont-exist"));
-            return;
-        }
         Scene target = ASmallWorld.inst().getData().getScenes().get(targetScene);
-        if (target == null) {
-            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.create.fail-target-dont-exist"));
-            return;
-        }
         if (creating.containsKey(player.getUniqueId())) {
             // The player clicked the previous message to set the target location.
             // The player is currently in the target scene.

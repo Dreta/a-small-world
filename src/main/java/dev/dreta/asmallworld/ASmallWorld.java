@@ -25,6 +25,7 @@ import dev.dreta.asmallworld.misc.ReloadCommand;
 import dev.dreta.asmallworld.player.CameraListener;
 import dev.dreta.asmallworld.scene.Scene;
 import dev.dreta.asmallworld.scene.SceneCommand;
+import dev.dreta.asmallworld.scene.SceneIDValidator;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
@@ -104,6 +105,7 @@ public final class ASmallWorld extends JavaPlugin {
         // Register commands
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("brigadier");
+        manager.getCommandConditions().addCondition(Integer.class, "sceneExist", new SceneIDValidator());
         manager.registerCommand(new ReloadCommand());
         manager.registerCommand(new SceneCommand());
 

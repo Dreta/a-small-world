@@ -16,6 +16,10 @@
 # along with A Small World.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+# Sent if ASW can't find a scene with the provided ID.
+# NOTE: This MUST be a string. You CAN NOT use a chat component here.
+scene-not-found: "This scene don't exist."
+
 # Message sent when ASW is reloaded.
 reloaded:
   text: "Successfully reloaded A Small World."
@@ -47,10 +51,6 @@ scene:
         color: "green"
   # Messages related to /aswscene unregister.
   unregister:
-    # Sent if ASW can't find a scene with the provided ID.
-    fail-dont-exist:
-      text: "This scene don't exist."
-      color: "red"
     # Sent after the scene is unregistered.
     # Available placeholders: {SCENE_NAME}, {SCENE_ID}.
     success:
@@ -127,10 +127,6 @@ scene:
         color: "yellow"
   # Messages related to /aswscene teleport
   teleport:
-    # Sent if ASW can't find a scene with the provided ID.
-    fail-dont-exist:
-      text: "This scene don't exist."
-      color: "red"
     # Sent to the teleporter when teleportation of another player
     # is successful.
     #
@@ -156,14 +152,6 @@ scene:
 portal:
   # Messages related to /aswportal create.
   create:
-    # Sent if ASW can't find the source scene with the provided ID.
-    fail-source-dont-exist:
-      text: "The source scene don't exist."
-      color: "red"
-    # Sent if ASW can't find the target scene with the provided ID.
-    fail-target-dont-exist:
-      text: "The target scene don't exist."
-      color: "red"
     # Sent if the player is not in the source scene that they
     # specified.
     not-in-source-scene:

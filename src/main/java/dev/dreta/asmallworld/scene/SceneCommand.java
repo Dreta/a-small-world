@@ -19,10 +19,7 @@
 package dev.dreta.asmallworld.scene;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Description;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.player.Camera;
 import net.kyori.adventure.text.Component;
@@ -66,12 +63,8 @@ public class SceneCommand extends BaseCommand {
     @Subcommand("unregister")
     @CommandPermission("asw.scene.manage")
     @Description("Unregisters a scene.")
-    public void unregister(CommandSender sender, int id) {
+    public void unregister(CommandSender sender, @Conditions("sceneExist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().remove(id);
-        if (scene == null) {
-            sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("scene.unregister.fail-dont-exist"));
-            return;
-        }
         ASmallWorld.inst().getData().save();
         sender.sendMessage(
                 ASmallWorld.inst().getMsg().getComponent("scene.unregister.success",
@@ -118,12 +111,8 @@ public class SceneCommand extends BaseCommand {
 
     @Subcommand("teleport")
     @Description("Teleports yourself to a scene.")
-    public void teleport(Player player, int id) {
+    public void teleport(Player player, @Conditions("sceneExist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(id);
-        if (scene == null) {
-            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("scene.teleport.fail-dont-exist"));
-            return;
-        }
         Camera camera = Camera.getCamera(player);
         camera.setScene(scene);
         scene.teleportPlayer(camera);
@@ -132,12 +121,8 @@ public class SceneCommand extends BaseCommand {
     @Subcommand("teleport")
     @CommandPermission("asw.scene.manage")
     @Description("Teleports another player to a scene.")
-    public void teleport(CommandSender sender, Player target, int id) {
+    public void teleport(CommandSender sender, Player target, @Conditions("sceneExist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(id);
-        if (scene == null) {
-            sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("scene.teleport.fail-dont-exist"));
-            return;
-        }
         Camera camera = Camera.getCamera(target);
         camera.setScene(scene);
         scene.teleportPlayer(camera);
