@@ -47,6 +47,12 @@ import java.util.Map;
  * specified location in a different scene.
  */
 public class Portal {
+    // To prevent a race condition (two portals created at the same time
+    // may have the same ID), you should use this lock when creating a portal
+    // from the construction of the portal up until you add this portal
+    // to the data store.
+    public static final Object createLock = new Object();
+
     @Getter
     private final int id;
 

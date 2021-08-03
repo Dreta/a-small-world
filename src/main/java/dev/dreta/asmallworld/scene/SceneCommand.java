@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
 @CommandAlias("aswscene")
 @CommandPermission("asw.scene")
 public class SceneCommand extends BaseCommand {
-    // FIXME Race condition when creating
-
     private static final int PAGE_ITEM_AMOUNT = 5;
 
     @Subcommand("create")
@@ -47,20 +45,22 @@ public class SceneCommand extends BaseCommand {
     @Description("Creates a scene at your current location.")
     public void create(Player player, String name) {
         Location loc = player.getLocation();
-        Scene scene = new Scene(name, loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), new ArrayList<>());
-        player.sendMessage(ASmallWorld.inst().getMsg().getComponent("scene.create.generation"));
-        scene.generateWalls();
-        scene.generatePlayerArea();
-        ASmallWorld.inst().getData().getScenes().put(scene.getId(), scene);
-        ASmallWorld.inst().getData().save();
-        player.sendMessage(
-                ASmallWorld.inst().getMsg().getComponent("scene.create.success",
-                        "{SCENE_ID}", scene.getId(),
-                        "{SCENE_NAME}", name,
-                        "{SCENE_WORLD}", loc.getWorld().getName(),
-                        "{SCENE_X}", loc.getBlockX(),
-                        "{SCENE_Y}", loc.getBlockY(),
-                        "{SCENE_Z}", loc.getBlockZ()));
+        synchronized (Scene.createLock) {
+            Scene scene = new Scene(name, loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), new ArrayList<>());
+            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("scene.create.generation"));
+            scene.generateWalls();
+            scene.generatePlayerArea();
+            ASmallWorld.inst().getData().getScenes().put(scene.getId(), scene);
+            ASmallWorld.inst().getData().save();
+            player.sendMessage(
+                    ASmallWorld.inst().getMsg().getComponent("scene.create.success",
+                            "{SCENE_ID}", scene.getId(),
+                            "{SCENE_NAME}", name,
+                            "{SCENE_WORLD}", loc.getWorld().getName(),
+                            "{SCENE_X}", loc.getBlockX(),
+                            "{SCENE_Y}", loc.getBlockY(),
+                            "{SCENE_Z}", loc.getBlockZ()));
+        }
     }
 
     @Subcommand("unregister")

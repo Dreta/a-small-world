@@ -56,6 +56,12 @@ import java.util.UUID;
  * comments are relative to the player control area.
  */
 public class Scene implements ConfigurationSerializable {
+    // To prevent a race condition (two scenes created at the same time
+    // may have the same ID), you should use this lock when creating a scene
+    // from the construction of the scene up until you add this scene
+    // to the data store.
+    public static final Object createLock = new Object();
+
     public static final int LENGTH = 21;
     public static final int WIDTH = 21;
     public static final int FULL_WIDTH = WIDTH + 5;

@@ -33,7 +33,6 @@ import java.util.*;
 @CommandPermission("asw.portal")
 public class PortalCommand {
     // TODO Refactor: Remove repeated "scene exist?" check.
-    // FIXME Race condition when creating
 
     // The players that requested to create a scene, but haven't
     // specified the target location yet.
@@ -61,21 +60,23 @@ public class PortalCommand {
                 player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.create.not-in-target-scene"));
                 return;
             }
-            Portal portal = new Portal(sourceScene, new ArrayList<>(Collections.singletonList(sourceLoc)), targetScene, targetLoc, false);
-            source.getPortals().add(portal);
-            ASmallWorld.inst().getData().save();
-            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.create.success",
-                    "{ID}", portal.getId(),
-                    "{SOURCE_ID}", sourceScene,
-                    "{SOURCE_NAME}", source.getName(),
-                    "{SOURCE_X}", sourceLoc.getBlockX(),
-                    "{SOURCE_Y}", sourceLoc.getBlockY(),
-                    "{SOURCE_Z}", sourceLoc.getBlockZ(),
-                    "{TARGET_ID}", targetScene,
-                    "{TARGET_NAME}", target.getName(),
-                    "{TARGET_X}", targetLoc.getBlockX(),
-                    "{TARGET_Y}", targetLoc.getBlockY(),
-                    "{TARGET_Z}", targetLoc.getBlockZ()));
+            synchronized (Portal.createLock) {
+                Portal portal = new Portal(sourceScene, new ArrayList<>(Collections.singletonList(sourceLoc)), targetScene, targetLoc, false);
+                source.getPortals().add(portal);
+                ASmallWorld.inst().getData().save();
+                player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.create.success",
+                        "{ID}", portal.getId(),
+                        "{SOURCE_ID}", sourceScene,
+                        "{SOURCE_NAME}", source.getName(),
+                        "{SOURCE_X}", sourceLoc.getBlockX(),
+                        "{SOURCE_Y}", sourceLoc.getBlockY(),
+                        "{SOURCE_Z}", sourceLoc.getBlockZ(),
+                        "{TARGET_ID}", targetScene,
+                        "{TARGET_NAME}", target.getName(),
+                        "{TARGET_X}", targetLoc.getBlockX(),
+                        "{TARGET_Y}", targetLoc.getBlockY(),
+                        "{TARGET_Z}", targetLoc.getBlockZ()));
+            }
             return;
         }
         // The player executed the command by themselves.
