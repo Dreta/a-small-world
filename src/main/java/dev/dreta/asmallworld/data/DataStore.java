@@ -53,7 +53,7 @@ public class DataStore extends Configuration {
         scenes.clear();
         for (Object scene : getList("scenes", Collections.emptyList())) {
             scenes.put(((Scene) scene).getId(), (Scene) scene);
-            for (Portal portal : ((Scene) scene).getPortals()) {
+            for (Portal portal : ((Scene) scene).getPortals().values()) {
                 portals.put(portal.getId(), portal);
             }
         }
