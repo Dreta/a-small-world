@@ -136,6 +136,15 @@ public class Scene implements ConfigurationSerializable {
     }
 
     /**
+     * Check if a location is within this scene.
+     */
+    public boolean contains(Location loc) {
+        return loc.getBlockX() >= x && loc.getBlockX() <= x + LENGTH &&
+                loc.getBlockY() >= y && loc.getBlockY() <= y + HEIGHT &&
+                loc.getBlockZ() >= z && loc.getBlockZ() <= FULL_WIDTH;
+    }
+
+    /**
      * Generate the walls of this scene.
      */
     public void generateWalls() {

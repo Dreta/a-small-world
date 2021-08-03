@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 @CommandAlias("aswscene")
 @CommandPermission("asw.scene")
 public class SceneCommand extends BaseCommand {
+    // FIXME Race condition when creating
+
     private static final int PAGE_ITEM_AMOUNT = 5;
 
     @Subcommand("create")

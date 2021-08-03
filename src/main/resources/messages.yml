@@ -151,3 +151,63 @@ scene:
     # No messages will be sent if the teleportation is successful,
     # as this command will be used for teleportation with external
     # signs, etc.
+
+# Messages related to /aswportal.
+portal:
+  # Messages related to /aswportal create.
+  create:
+    # Sent if ASW can't find the source scene with the provided ID.
+    fail-source-dont-exist:
+      text: "The source scene don't exist."
+      color: "red"
+    # Sent if ASW can't find the target scene with the provided ID.
+    fail-target-dont-exist:
+      text: "The target scene don't exist."
+      color: "red"
+    # Sent if the player is not in the source scene that they
+    # specified.
+    not-in-source-scene:
+      text: "You are not in the source scene that you specified."
+      color: "red"
+    # Sent if the player is not in the target scene that they
+    # specified.
+    not-in-target-scene:
+      text: "You are not in the target scene that you specified."
+      color: "red"
+    # Sent to the player after they started to create a portal,
+    # asking them to go to the target location.
+    # Available placeholders: {SOURCE}, {TARGET}
+    # {SOURCE} is the ID of the source scene.
+    # {TARGET} is the ID of the target scene.
+    go-to-target-scene:
+      - text: "Please go to the target location of this portal, then "
+        color: "green"
+      - text: "[click here]"
+        color: "yellow"
+        hoverEvent:
+          action: "show_text"
+          value:
+            text: "Set target location"
+        clickEvent:
+          action: "run_command"
+          value: "/aswportal create {SOURCE} {TARGET}"
+    # Sent when the portal is successfully created.
+    # Available placeholders: {ID}, {SOURCE_ID}, {SOURCE_NAME}, {SOURCE_X}, {SOURCE_Y}, {SOURCE_Z}, {TARGET_ID}, {TARGET_NAME}, {TARGET_X}, {TARGET_Y}, {TARGET_Z}
+    # {ID} is the ID of this portal.
+    # {SOURCE_ID} is the ID of the source scene (where the portal is in).
+    # {SOURCE_NAME} is the name of the source scene.
+    # {SOURCE_X} is the X position of THE PORTAL.
+    # {SOURCE_Y} is the Y position of THE PORTAL.
+    # {SOURCE_Z} is the Z position of THE PORTAL.
+    # {TARGET_ID} is the ID of the target scene.
+    # {TARGET_NAME} is the name of the target scene.
+    # {TARGET_X} is the X position of WHERE THE PORTAL WILL TELEPORT TO.
+    # {TARGET_Y} is the Y position of WHERE THE PORTAL WILL TELEPORT TO.
+    # {TARGET_Z} is the Z position of WHERE THE PORTAL WILL TELEPORT TO.
+    success:
+      - text: "Successfully created the portal with ID "
+        color: "green"
+      - text: "{ID}"
+        color: "yellow"
+      - text: "."
+        color: "green"
