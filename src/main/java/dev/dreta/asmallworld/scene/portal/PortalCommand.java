@@ -92,6 +92,7 @@ public class PortalCommand {
             return;
         }
         scene.getPortals().remove(portalID);
+        ASmallWorld.inst().getData().getPortals().remove(portalID);
         ASmallWorld.inst().getData().save();
         sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.unregister.success",
                 "{ID}", portalID,
