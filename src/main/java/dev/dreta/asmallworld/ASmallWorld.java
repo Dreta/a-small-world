@@ -26,6 +26,7 @@ import dev.dreta.asmallworld.player.CameraListener;
 import dev.dreta.asmallworld.scene.Scene;
 import dev.dreta.asmallworld.scene.SceneCommand;
 import dev.dreta.asmallworld.scene.SceneIDValidator;
+import dev.dreta.asmallworld.scene.portal.PortalCommand;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
@@ -108,6 +109,7 @@ public final class ASmallWorld extends JavaPlugin {
         manager.getCommandConditions().addCondition(Integer.class, "sceneExist", new SceneIDValidator());
         manager.registerCommand(new ReloadCommand());
         manager.registerCommand(new SceneCommand());
+        manager.registerCommand(new PortalCommand());
 
         // Register listeners
         new CameraListener();

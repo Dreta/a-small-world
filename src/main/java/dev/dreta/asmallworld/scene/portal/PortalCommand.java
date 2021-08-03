@@ -18,6 +18,7 @@
 
 package dev.dreta.asmallworld.scene.portal;
 
+import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.scene.Scene;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 
 @CommandAlias("aswportal")
 @CommandPermission("asw.portal")
-public class PortalCommand {
+public class PortalCommand extends BaseCommand {
     // The players that requested to create a scene, but haven't
     // specified the target location yet.
     private static final Map<UUID, Location> creating = new HashMap<>();
