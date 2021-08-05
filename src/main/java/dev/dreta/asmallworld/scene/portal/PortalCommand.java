@@ -21,10 +21,18 @@ package dev.dreta.asmallworld.scene.portal;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import dev.dreta.asmallworld.ASmallWorld;
+import dev.dreta.asmallworld.player.Camera;
 import dev.dreta.asmallworld.scene.Scene;
 import net.kyori.adventure.text.Component;
+import net.minecraft.network.protocol.game.ClientboundAddMobPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.Slime;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -38,6 +46,61 @@ public class PortalCommand extends BaseCommand {
     private static final Map<UUID, Location> creating = new HashMap<>();
 
     private static final int PAGE_ITEM_AMOUNT = 5;
+
+    /**
+     * Sends an invisible medium slime with glowing to a player
+     * at a specific block, highlighting that block.
+     *
+     * @param player   The player to send the entity to
+     * @param location The location of the block to highlight
+     * @param duration How long the highlight should last, in <b>ticks</b>.
+     */
+    private static void sendBlockHighlight(Player player, Location location, long duration) {
+        Camera camera = Camera.getCamera(player);
+
+        // Create slime, set size and location.
+        // This slime won't move because it is only displayed clientside,
+        // and isn't ticked on the server.
+        Slime slime = new Slime(EntityType.SLIME, ((CraftWorld) location.getWorld()).getHandle());
+        slime.setSize(2 /* same size as a block */, false /* don't regenerate to full health */);
+        slime.setXRot(0);
+        slime.setYRot(0);
+        slime.setYBodyRot(0);
+        slime.setYHeadRot(0);
+        slime.setPos(location.getBlockX() + 0.5, location.getBlockY(), location.getBlockZ() + 0.5);
+
+        // Make the slime invisible and glowing.
+        slime.setInvisible(true);
+        slime.setGlowingTag(true);
+        slime.collides = false;
+
+        // Send the relevant packets.
+        camera.sendPacket(new ClientboundAddMobPacket(slime));
+        camera.sendPacket(new ClientboundSetEntityDataPacket(slime.getId() /* Entity ID */, slime.getEntityData(), true /* Remove invalid data */));
+
+        // Schedule removal of the fake entity after the specified duration.
+        Bukkit.getScheduler().runTaskLater(ASmallWorld.inst(), () ->
+                camera.sendPacket(new ClientboundRemoveEntitiesPacket(slime.getId())), duration);
+    }
+
+    @Subcommand("highlight")
+    @Description("Highlight where the portal is within a scene.")
+    public void highlight(Player player, @Conditions("sceneexist") int sceneID, int portalID) {
+        Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
+        if (!scene.getPortals().containsKey(portalID)) {
+            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.highlight.portal-dont-exist"));
+            return;
+        }
+
+        Portal portal = scene.getPortals().get(portalID);
+        int duration = ASmallWorld.inst().getConf().getInt("scene.portal.highlight-duration");
+        for (Location location : portal.getBlocks()) {
+            sendBlockHighlight(player, location, duration * 20L);
+        }
+
+        player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.highlight.success",
+                "{HIGHLIGHT_SECONDS}", duration));
+    }
 
     @Subcommand("cancel")
     @Description("Cancel the creation of a new portal.")

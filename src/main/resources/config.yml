@@ -28,6 +28,11 @@ scene:
     # stepped on the portal, in milliseconds.
     delay: 500
 
+    # You can highlight a portal with /aswportal highlight.
+    # This option sets how long the highlight will last for
+    # in seconds.
+    highlight-duration: 20
+
     # Before reaching the final location, the player can be
     # teleported into a "load screen" where information about
     # the destination can be displayed. You can configure whether

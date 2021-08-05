@@ -271,7 +271,7 @@ portal:
       - text: "{PORTALS}"
       - text: "Use "
         color: "green"
-      - text: "/aswportal visualize <portal>"
+      - text: "/aswportal highlight <scene id> <portal id>"
         color: "yellow"
       - text: " to see where the portal is.\n"
         color: "green"
@@ -304,3 +304,18 @@ portal:
         color: "green"
       - text: "{TARGET_SCENE_ID} {TARGET_SCENE_NAME} ({TARGET_X}, {TARGET_Y}, {TARGET_Z})"
         color: "yellow"
+  # Messages related to /aswportal highlight.
+  highlight:
+    # Sent if the portal don't exist.
+    portal-dont-exist:
+      text: "This portal don't exist."
+      color: "red"
+    # Sent after the portal is highlighted.
+    # Available placeholders: {HIGHLIGHT_SECONDS}
+    success:
+      - text: "Successfully highlighted portal. The highlight will disappear after "
+        color: "green"
+      - text: "{HIGHLIGHT_SECONDS}"
+        color: "yellow"
+      - text: " seconds."
+        color: "green"

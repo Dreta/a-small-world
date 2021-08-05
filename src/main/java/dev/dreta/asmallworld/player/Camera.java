@@ -26,7 +26,9 @@ import lombok.SneakyThrows;
 import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.minecraft.network.protocol.Packet;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -122,6 +124,10 @@ public class Camera {
 
     public void sendMessage(Identified source, Component component) {
         player.sendMessage(source, component);
+    }
+
+    public void sendPacket(Packet<?> packet) {
+        ((CraftPlayer) player).getHandle().connection.send(packet);
     }
 
     public void load() {

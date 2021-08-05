@@ -72,11 +72,11 @@ public final class ASmallWorld extends JavaPlugin {
             return;
         }
 
-        if (!getServer().getPluginManager().isPluginEnabled("ProtocolLib")) {
-            logger.severe("ASW requires ProtocolLib to properly function. Please install ProtocolLib before continuing.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        //if (!getServer().getPluginManager().isPluginEnabled("ProtocolLib")) {
+        //    logger.severe("ASW requires ProtocolLib to properly function. Please install ProtocolLib before continuing.");
+        //    getServer().getPluginManager().disablePlugin(this);
+        //    return;
+        //}
 
         // Load configuration and data
         ConfigurationSerialization.registerClass(Scene.class);
