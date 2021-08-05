@@ -39,7 +39,14 @@ public class PortalCommand extends BaseCommand {
 
     private static final int PAGE_ITEM_AMOUNT = 5;
 
-    // TODO Add sub command to cancel creation
+    @Subcommand("cancel")
+    @Description("Cancel the creation of a new portal.")
+    public void cancel(Player player) {
+        if (creating.remove(player.getUniqueId()) != null) {
+            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.create.cancel"));
+        }
+    }
+
     @Subcommand("create")
     @Description("Creates a portal at your current location.")
     public void create(Player player, @Conditions("sceneexist") int sourceScene, @Conditions("sceneexist") int targetScene) {

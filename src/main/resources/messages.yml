@@ -179,7 +179,18 @@ portal:
         clickEvent:
           action: "run_command"
           value: "/aswportal create {SOURCE} {TARGET}"
-      - text: "."
+      - text: ", or "
+        color: "green"
+      - text: "[click here]"
+        color: "yellow"
+        hoverEvent:
+          action: "show_text"
+          value:
+            text: "Cancel portal creation"
+        clickEvent:
+          action: "run_command"
+          value: "/aswportal cancel"
+      - text: " to cancel."
         color: "green"
     # Sent when the portal is successfully created.
     # Available placeholders: {ID}, {SOURCE_ID}, {SOURCE_NAME}, {SOURCE_X}, {SOURCE_Y}, {SOURCE_Z}, {TARGET_ID}, {TARGET_NAME}, {TARGET_X}, {TARGET_Y}, {TARGET_Z}
@@ -200,6 +211,10 @@ portal:
       - text: "{ID}"
         color: "yellow"
       - text: "."
+        color: "green"
+    # Sent when the player cancelled the creation of a new portal.
+    cancel:
+      - text: "Cancelled portal creation."
         color: "green"
   # Messages related to /aswportal unregister.
   unregister:
