@@ -27,7 +27,15 @@ import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddMobPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.Slime;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -128,6 +136,39 @@ public class Camera {
 
     public void sendPacket(Packet<?> packet) {
         ((CraftPlayer) player).getHandle().connection.send(packet);
+    }
+
+    /**
+     * Sends an invisible medium slime with glowing to this camera
+     * at a specific block, highlighting that block.
+     *
+     * @param location The location of the block to highlight
+     * @param duration How long the highlight should last, in <b>ticks</b>.
+     */
+    public void sendBlockHighlight(Location location, long duration) {
+        // Create slime, set size and location.
+        // This slime won't move because it is only displayed clientside,
+        // and isn't ticked on the server.
+        Slime slime = new Slime(EntityType.SLIME, ((CraftWorld) location.getWorld()).getHandle());
+        slime.setSize(2 /* same size as a block */, false /* don't regenerate to full health */);
+        slime.setXRot(0);
+        slime.setYRot(0);
+        slime.setYBodyRot(0);
+        slime.setYHeadRot(0);
+        slime.setPos(location.getBlockX() + 0.5, location.getBlockY(), location.getBlockZ() + 0.5);
+
+        // Make the slime invisible and glowing.
+        slime.setInvisible(true);
+        slime.setGlowingTag(true);
+        slime.collides = false;
+
+        // Send the relevant packets.
+        sendPacket(new ClientboundAddMobPacket(slime));
+        sendPacket(new ClientboundSetEntityDataPacket(slime.getId() /* Entity ID */, slime.getEntityData(), true /* Remove invalid data */));
+
+        // Schedule removal of the fake entity after the specified duration.
+        Bukkit.getScheduler().runTaskLater(ASmallWorld.inst(), () ->
+                sendPacket(new ClientboundRemoveEntitiesPacket(slime.getId())), duration);
     }
 
     public void load() {

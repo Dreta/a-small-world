@@ -23,16 +23,10 @@ import co.aikar.commands.annotation.*;
 import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.player.Camera;
 import dev.dreta.asmallworld.scene.Scene;
+import dev.dreta.asmallworld.utils.Utils;
 import net.kyori.adventure.text.Component;
-import net.minecraft.network.protocol.game.ClientboundAddMobPacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Slime;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -47,45 +41,10 @@ public class PortalCommand extends BaseCommand {
 
     private static final int PAGE_ITEM_AMOUNT = 5;
 
-    /**
-     * Sends an invisible medium slime with glowing to a player
-     * at a specific block, highlighting that block.
-     *
-     * @param player   The player to send the entity to
-     * @param location The location of the block to highlight
-     * @param duration How long the highlight should last, in <b>ticks</b>.
-     */
-    private static void sendBlockHighlight(Player player, Location location, long duration) {
-        Camera camera = Camera.getCamera(player);
-
-        // Create slime, set size and location.
-        // This slime won't move because it is only displayed clientside,
-        // and isn't ticked on the server.
-        Slime slime = new Slime(EntityType.SLIME, ((CraftWorld) location.getWorld()).getHandle());
-        slime.setSize(2 /* same size as a block */, false /* don't regenerate to full health */);
-        slime.setXRot(0);
-        slime.setYRot(0);
-        slime.setYBodyRot(0);
-        slime.setYHeadRot(0);
-        slime.setPos(location.getBlockX() + 0.5, location.getBlockY(), location.getBlockZ() + 0.5);
-
-        // Make the slime invisible and glowing.
-        slime.setInvisible(true);
-        slime.setGlowingTag(true);
-        slime.collides = false;
-
-        // Send the relevant packets.
-        camera.sendPacket(new ClientboundAddMobPacket(slime));
-        camera.sendPacket(new ClientboundSetEntityDataPacket(slime.getId() /* Entity ID */, slime.getEntityData(), true /* Remove invalid data */));
-
-        // Schedule removal of the fake entity after the specified duration.
-        Bukkit.getScheduler().runTaskLater(ASmallWorld.inst(), () ->
-                camera.sendPacket(new ClientboundRemoveEntitiesPacket(slime.getId())), duration);
-    }
-
     @Subcommand("highlight")
     @Description("Highlights where the portal is within a scene.")
     public void highlight(Player player, @Conditions("sceneexist") int sceneID, int portalID) {
+        Camera camera = Camera.getCamera(player);
         Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
         if (!scene.getPortals().containsKey(portalID)) {
             player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.portal-dont-exist"));
@@ -94,8 +53,8 @@ public class PortalCommand extends BaseCommand {
 
         Portal portal = scene.getPortals().get(portalID);
         int duration = ASmallWorld.inst().getConf().getInt("scene.portal.highlight-duration");
-        for (Location location : portal.getBlocks()) {
-            sendBlockHighlight(player, location, duration * 20L);
+        for (Location location : portal.getBlocks().values()) {
+            camera.sendBlockHighlight(location, duration * 20L);
         }
 
         player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.highlight.success",
@@ -237,23 +196,18 @@ public class PortalCommand extends BaseCommand {
                 return;
             }
             // TODO Don't iterate, optimize with hashing
-            for (Location loc : portal.getBlocks()) {
-                if (loc.getWorld().getName().equals(player.getWorld().getName()) &&
-                        player.getLocation().getBlockX() == loc.getBlockX() &&
-                        player.getLocation().getBlockY() == loc.getBlockY() &&
-                        player.getLocation().getBlockZ() == loc.getBlockZ()) {
-                    player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.blocks.add.fail-duplicate",
-                            "{WORLD}", player.getWorld().getName(),
-                            "{BLOCK_X}", player.getLocation().getBlockX(),
-                            "{BLOCK_Y}", player.getLocation().getBlockY(),
-                            "{BLOCK_Z}", player.getLocation().getBlockZ(),
-                            "{PORTAL_ID}", portalID,
-                            "{SCENE_ID}", sceneID,
-                            "{SCENE_NAME}", scene.getName()));
-                    return;
-                }
+            if (portal.getBlocks().containsKey(Utils.hashLocationToBlock(player.getLocation()))) {
+                player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.blocks.add.fail-duplicate",
+                        "{WORLD}", player.getWorld().getName(),
+                        "{BLOCK_X}", player.getLocation().getBlockX(),
+                        "{BLOCK_Y}", player.getLocation().getBlockY(),
+                        "{BLOCK_Z}", player.getLocation().getBlockZ(),
+                        "{PORTAL_ID}", portalID,
+                        "{SCENE_ID}", sceneID,
+                        "{SCENE_NAME}", scene.getName()));
+                return;
             }
-            portal.getBlocks().add(player.getLocation());
+            portal.getBlocks().put(Utils.hashLocationToBlock(player.getLocation()), player.getLocation());
             ASmallWorld.inst().getData().save();
             player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.blocks.add.success",
                     "{WORLD}", player.getWorld().getName(),
@@ -275,12 +229,7 @@ public class PortalCommand extends BaseCommand {
             }
 
             Portal portal = scene.getPortals().get(portalID);
-            int oldLength = portal.getBlocks().size();
-            // TODO Don't iterate, optimize with hashing
-            portal.getBlocks().removeIf(loc -> loc.getWorld().getName().equals(player.getWorld().getName()) && player.getLocation().getBlockX() == loc.getBlockX() &&
-                    player.getLocation().getBlockY() == loc.getBlockY() && player.getLocation().getBlockZ() == loc.getBlockZ());
-            ASmallWorld.inst().getData().save();
-            if (oldLength == portal.getBlocks().size()) {
+            if (portal.getBlocks().remove(Utils.hashLocationToBlock(player.getLocation())) == null) {
                 // No change
                 player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.blocks.remove.fail",
                         "{WORLD}", player.getWorld().getName(),
@@ -292,6 +241,7 @@ public class PortalCommand extends BaseCommand {
                         "{SCENE_NAME}", scene.getName()));
                 return;
             }
+            ASmallWorld.inst().getData().save();
             player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.blocks.remove.success",
                     "{WORLD}", player.getWorld().getName(),
                     "{BLOCK_X}", player.getLocation().getBlockX(),

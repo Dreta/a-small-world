@@ -21,6 +21,7 @@ package dev.dreta.asmallworld.scene.portal;
 import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.player.Camera;
 import dev.dreta.asmallworld.scene.Scene;
+import dev.dreta.asmallworld.utils.Utils;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -33,7 +34,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +67,7 @@ public class Portal implements ConfigurationSerializable {
      * The blocks included with this portal.
      */
     @Getter
-    private final List<Location> blocks;
+    private final Map<Integer, Location> blocks;
 
     /**
      * The ID of the target scene of this portal.
@@ -100,7 +100,10 @@ public class Portal implements ConfigurationSerializable {
     private Portal(int id, int scene, List<Location> blocks, int target, Location targetLocation, boolean useLoadScreen) {
         this.id = id;
         this.scene = scene;
-        this.blocks = new ArrayList<>(blocks); // Ensure that this list is modifiable
+        this.blocks = new HashMap<>();
+        for (Location block : blocks) {
+            this.blocks.put(Utils.hashLocationToBlock(block), block);
+        }
         this.target = target;
         this.targetLocation = targetLocation;
         this.useLoadScreen = useLoadScreen;
@@ -168,6 +171,6 @@ public class Portal implements ConfigurationSerializable {
 
     @Override
     public @NotNull Map<String, Object> serialize() {
-        return Map.of("id", id, "scene", scene, "blocks", blocks, "target", target, "targetLocation", targetLocation, "useLoadScreen", useLoadScreen);
+        return Map.of("id", id, "scene", scene, "blocks", blocks.values().stream().toList(), "target", target, "targetLocation", targetLocation, "useLoadScreen", useLoadScreen);
     }
 }
