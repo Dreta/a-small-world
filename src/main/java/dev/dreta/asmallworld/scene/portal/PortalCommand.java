@@ -84,11 +84,11 @@ public class PortalCommand extends BaseCommand {
     }
 
     @Subcommand("highlight")
-    @Description("Highlight where the portal is within a scene.")
+    @Description("Highlights where the portal is within a scene.")
     public void highlight(Player player, @Conditions("sceneexist") int sceneID, int portalID) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
         if (!scene.getPortals().containsKey(portalID)) {
-            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.highlight.portal-dont-exist"));
+            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.portal-dont-exist"));
             return;
         }
 
@@ -103,7 +103,7 @@ public class PortalCommand extends BaseCommand {
     }
 
     @Subcommand("cancel")
-    @Description("Cancel the creation of a new portal.")
+    @Description("Cancels the creation of a new portal.")
     public void cancel(Player player) {
         if (creating.remove(player.getUniqueId()) != null) {
             player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.create.cancel"));
@@ -161,7 +161,7 @@ public class PortalCommand extends BaseCommand {
     public void unregister(CommandSender sender, @Conditions("sceneexist") int sceneID, int portalID) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
         if (!scene.getPortals().containsKey(portalID)) {
-            sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.unregister.portal-dont-exist"));
+            sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.portal-dont-exist"));
             return;
         }
         scene.getPortals().remove(portalID);
@@ -208,5 +208,98 @@ public class PortalCommand extends BaseCommand {
                 "{NEXT_PAGE_ARROW}", page == total ? "   " : "[>]",
                 "{PREVIOUS_PAGE}", page - 1,
                 "{NEXT_PAGE}", page + 1));
+    }
+
+    @Subcommand("blocks")
+    public class Blocks extends BaseCommand {
+        @Subcommand("highlight")
+        @Description("Highlight the blocks of a portal within a scene.")
+        public void highlight(Player player, @Conditions("sceneexist") int sceneID, int portalID) {
+            PortalCommand.this.highlight(player, sceneID, portalID);
+        }
+
+        @Subcommand("add")
+        @Description("Adds the block you are currently in to a portal.")
+        public void add(Player player, @Conditions("sceneexist") int sceneID, int portalID) {
+            Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
+            if (!scene.getPortals().containsKey(portalID)) {
+                player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.portal-dont-exist"));
+                return;
+            }
+
+            Portal portal = scene.getPortals().get(portalID);
+            if (portal.getBlocks().size() >= ASmallWorld.inst().getConf().getInt("scene.portal.max-blocks")) {
+                player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.blocks.add.fail-too-many",
+                        "{MAX_BLOCKS}", ASmallWorld.inst().getConf().getInt("scene.portal.max-blocks"),
+                        "{PORTAL_ID}", portalID,
+                        "{SCENE_ID}", sceneID,
+                        "{SCENE_NAME}", scene.getName()));
+                return;
+            }
+            // TODO Don't iterate, optimize with hashing
+            for (Location loc : portal.getBlocks()) {
+                if (loc.getWorld().getName().equals(player.getWorld().getName()) &&
+                        player.getLocation().getBlockX() == loc.getBlockX() &&
+                        player.getLocation().getBlockY() == loc.getBlockY() &&
+                        player.getLocation().getBlockZ() == loc.getBlockZ()) {
+                    player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.blocks.add.fail-duplicate",
+                            "{WORLD}", player.getWorld().getName(),
+                            "{BLOCK_X}", player.getLocation().getBlockX(),
+                            "{BLOCK_Y}", player.getLocation().getBlockY(),
+                            "{BLOCK_Z}", player.getLocation().getBlockZ(),
+                            "{PORTAL_ID}", portalID,
+                            "{SCENE_ID}", sceneID,
+                            "{SCENE_NAME}", scene.getName()));
+                    return;
+                }
+            }
+            portal.getBlocks().add(player.getLocation());
+            ASmallWorld.inst().getData().save();
+            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.blocks.add.success",
+                    "{WORLD}", player.getWorld().getName(),
+                    "{BLOCK_X}", player.getLocation().getBlockX(),
+                    "{BLOCK_Y}", player.getLocation().getBlockY(),
+                    "{BLOCK_Z}", player.getLocation().getBlockZ(),
+                    "{PORTAL_ID}", portalID,
+                    "{SCENE_ID}", sceneID,
+                    "{SCENE_NAME}", scene.getName()));
+        }
+
+        @Subcommand("remove")
+        @Description("Removes the block you are currently in from a portal.")
+        public void remove(Player player, @Conditions("sceneexist") int sceneID, int portalID) {
+            Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
+            if (!scene.getPortals().containsKey(portalID)) {
+                player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.portal-dont-exist"));
+                return;
+            }
+
+            Portal portal = scene.getPortals().get(portalID);
+            int oldLength = portal.getBlocks().size();
+            // TODO Don't iterate, optimize with hashing
+            portal.getBlocks().removeIf(loc -> loc.getWorld().getName().equals(player.getWorld().getName()) && player.getLocation().getBlockX() == loc.getBlockX() &&
+                    player.getLocation().getBlockY() == loc.getBlockY() && player.getLocation().getBlockZ() == loc.getBlockZ());
+            ASmallWorld.inst().getData().save();
+            if (oldLength == portal.getBlocks().size()) {
+                // No change
+                player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.blocks.remove.fail",
+                        "{WORLD}", player.getWorld().getName(),
+                        "{BLOCK_X}", player.getLocation().getBlockX(),
+                        "{BLOCK_Y}", player.getLocation().getBlockY(),
+                        "{BLOCK_Z}", player.getLocation().getBlockZ(),
+                        "{PORTAL_ID}", portalID,
+                        "{SCENE_ID}", sceneID,
+                        "{SCENE_NAME}", scene.getName()));
+                return;
+            }
+            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.blocks.remove.success",
+                    "{WORLD}", player.getWorld().getName(),
+                    "{BLOCK_X}", player.getLocation().getBlockX(),
+                    "{BLOCK_Y}", player.getLocation().getBlockY(),
+                    "{BLOCK_Z}", player.getLocation().getBlockZ(),
+                    "{PORTAL_ID}", portalID,
+                    "{SCENE_ID}", sceneID,
+                    "{SCENE_NAME}", scene.getName()));
+        }
     }
 }

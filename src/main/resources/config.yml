@@ -24,6 +24,13 @@ scene:
 
   # Configuration related to portals.
   portal:
+    # The maximum amount of blocks allowed within one portal.
+    # Adding way too much blocks in a portal could cause:
+    #  * High server memory consumption due to portal caching
+    #  * Extreme client lag when highlighting a portal due to too many entities being sent
+    #  * Overall worse performance
+    max-blocks: 10
+
     # Delay before teleporting the player after they've
     # stepped on the portal, in milliseconds.
     delay: 500

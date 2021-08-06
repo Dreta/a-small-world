@@ -150,6 +150,11 @@ scene:
 
 # Messages related to /aswportal.
 portal:
+  # Sent if the portal don't exist.
+  portal-dont-exist:
+    text: "This portal don't exist."
+    color: "red"
+
   # Messages related to /aswportal create.
   create:
     # Sent if the player is not in the source scene that they
@@ -218,10 +223,6 @@ portal:
         color: "green"
   # Messages related to /aswportal unregister.
   unregister:
-    # Sent if the portal don't exist.
-    portal-dont-exist:
-      text: "This portal don't exist."
-      color: "red"
     # Sent when a portal is successfully unregistered.
     # Available placeholders: {ID}, {SCENE_ID}
     success:
@@ -306,10 +307,6 @@ portal:
         color: "yellow"
   # Messages related to /aswportal highlight.
   highlight:
-    # Sent if the portal don't exist.
-    portal-dont-exist:
-      text: "This portal don't exist."
-      color: "red"
     # Sent after the portal is highlighted.
     # Available placeholders: {HIGHLIGHT_SECONDS}
     success:
@@ -319,3 +316,61 @@ portal:
         color: "yellow"
       - text: " seconds."
         color: "green"
+  # Messages related to /aswportal blocks.
+  blocks:
+    # Messages related to /aswportal blocks add.
+    add:
+      # Sent when a block is successfully added.
+      # Available placeholders: {WORLD}, {BLOCK_X}, {BLOCK_Y}, {BLOCK_Z}, {PORTAL_ID}, {SCENE_ID}, {SCENE_NAME}
+      success:
+        - text: "Successfully added "
+          color: "green"
+        - text: "({WORLD}, {BLOCK_X}, {BLOCK_Y}, {BLOCK_Z})"
+          color: "yellow"
+        - text: " to portal "
+          color: "green"
+        - text: "{PORTAL_ID}"
+          color: "yellow"
+        - text: "."
+          color: "green"
+
+      # Sent if there are too many blocks in this portal.
+      # Available placeholders: {PORTAL_ID}, {SCENE_ID}, {SCENE_NAME}, {MAX_BLOCKS}
+      fail-too-many:
+        - text: "A portal may only have "
+          color: "red"
+        - text: "{MAX_BLOCKS}"
+          color: "yellow"
+        - text: " blocks."
+          color: "red"
+
+      # Sent if this block is already in this portal.
+      # Available placeholders: {WORLD}, {BLOCK_X}, {BLOCK_Y}, {BLOCK_Z}, {PORTAL_ID}, {SCENE_ID}, {SCENE_NAME}
+      fail-duplicate:
+        text: "This block is already in this portal."
+        color: "red"
+    # Messages related to /aswportal blocks remove.
+    remove:
+      # Sent when a block is successfully removed.
+      # Available placeholders: {WORLD}, {BLOCK_X}, {BLOCK_Y}, {BLOCK_Z}, {PORTAL_ID}, {SCENE_ID}, {SCENE_NAME}
+      success:
+        - text: "Successfully removed "
+          color: "green"
+        - text: "({WORLD}, {BLOCK_X}, {BLOCK_Y}, {BLOCK_Z})"
+          color: "yellow"
+        - text: " from portal "
+          color: "green"
+        - text: "{PORTAL_ID}"
+          color: "yellow"
+        - text: "."
+          color: "green"
+
+      # Sent if the portal isn't in the specified location.
+      # Available placeholders: {WORLD}, {BLOCK_X}, {BLOCK_Y}, {BLOCK_Z}, {PORTAL_ID}, {SCENE_ID}, {SCENE_NAME}
+      fail:
+        - text: "This portal isn't in "
+          color: "red"
+        - text: "({WORLD}, {BLOCK_X}, {BLOCK_Y}, {BLOCK_Z})"
+          color: "yellow"
+        - text: "."
+          color: "red"
