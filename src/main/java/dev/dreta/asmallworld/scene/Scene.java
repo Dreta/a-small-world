@@ -22,6 +22,7 @@ import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.player.Camera;
 import dev.dreta.asmallworld.scene.portal.Portal;
 import lombok.Getter;
+import net.minecraft.server.level.ServerLevel;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -141,12 +142,37 @@ public class Scene implements ConfigurationSerializable {
                 (int) map.get("x"), (int) map.get("y"), (int) map.get("z"), (List<Portal>) map.get("portals"));
     }
 
+    public void addCamera(Camera camera) {
+        for (UUID uuid : cameras) {
+            Camera cam = Camera.getCamera(uuid);
+            if (cam.isNpcSpawned()) {
+                cam.spawnNPC(camera);
+            }
+        }
+        cameras.add(camera.getUniqueId());
+    }
+
+    public void removeCamera(UUID uuid) {
+        if (!cameras.remove(uuid)) {
+            return;
+        }
+        Camera camera = Camera.getCamera(uuid);
+        camera.despawnNPC();
+        for (UUID uid : cameras) {
+            Camera cam = Camera.getCamera(uid);
+            if (cam.isNpcSpawned()) {
+                cam.despawnNPC(camera);
+            }
+        }
+    }
+
     /**
      * Check if a location is within this scene, not including
      * the blocking area.
      */
     public boolean contains(Location loc) {
-        return loc.getBlockX() >= x && loc.getBlockX() <= x + LENGTH &&
+        return loc.getWorld().getUID().equals(world.getUID()) &&
+                loc.getBlockX() >= x && loc.getBlockX() <= x + LENGTH &&
                 loc.getBlockY() >= y && loc.getBlockY() <= y + HEIGHT &&
                 loc.getBlockZ() >= z && loc.getBlockZ() <= z + WIDTH;
     }
@@ -155,7 +181,8 @@ public class Scene implements ConfigurationSerializable {
      * Check if a location is within the entire scene.
      */
     public boolean containsFull(Location loc) {
-        return loc.getBlockX() >= x && loc.getBlockX() <= x + LENGTH &&
+        return loc.getWorld().getUID().equals(world.getUID()) &&
+                loc.getBlockX() >= x && loc.getBlockX() <= x + LENGTH &&
                 loc.getBlockY() >= y && loc.getBlockY() <= y + HEIGHT &&
                 loc.getBlockZ() >= z && loc.getBlockZ() <= z + FULL_WIDTH;
     }
@@ -226,8 +253,30 @@ public class Scene implements ConfigurationSerializable {
      * @param camera The player to teleport
      */
     public void teleportPlayer(Camera camera) {
-        // TODO Teleport the player's associated entity as well
+        teleportPlayer(camera, null);
+    }
+
+    /**
+     * Teleport a player to the player area.
+     *
+     * @param camera   The player to teleport
+     * @param location Where to teleport the associated NPC to
+     */
+    public void teleportPlayer(Camera camera, Location location) {
         camera.setScene(this);
+        if (location == null) {
+            location = new Location(world, x + 12 + 0.5, y, z + 12 + 0.5);
+        }
+        if (!((ServerLevel) camera.getNpc().level).uuid.equals(world.getUID())) {
+            // Regenerate NPC in target world
+            camera.initNPC(world);
+        }
+        camera.getNpc().setPos(location.getX(), location.getY(), location.getZ());
+        if (camera.isNpcSpawned()) {
+            camera.teleportNPC();
+        } else {
+            camera.spawnNPC();
+        }
         camera.getPlayer().teleport(new Location(world, x + 12 + 0.5, y + HEIGHT - 2, z + FULL_WIDTH + 0.5, 180, 50));
     }
 

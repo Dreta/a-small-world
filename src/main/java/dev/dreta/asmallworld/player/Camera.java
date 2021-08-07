@@ -18,6 +18,8 @@
 
 package dev.dreta.asmallworld.player;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.scene.Scene;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
@@ -27,14 +29,19 @@ import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundAddMobPacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Slime;
+import net.minecraft.world.entity.npc.Villager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -64,6 +71,11 @@ public class Camera {
     private final Configuration playerData;
     @Getter
     private Scene scene;
+
+    @Getter
+    private LivingEntity npc;
+    @Getter
+    private boolean npcSpawned;
 
     @SneakyThrows
     public Camera(Player player) {
@@ -100,10 +112,10 @@ public class Camera {
 
     public void setScene(Scene scene) {
         if (this.scene != null) {
-            this.scene.getCameras().remove(getUniqueId());
+            this.scene.removeCamera(getUniqueId());
         }
         this.scene = scene;
-        scene.getCameras().add(getUniqueId());
+        this.scene.addCamera(this);
     }
 
     public String getName() {
@@ -120,6 +132,130 @@ public class Camera {
 
     public UUID getUniqueId() {
         return player.getUniqueId();
+    }
+
+    /**
+     * Spawn the NPC that is bound to this camera.
+     */
+    public void spawnNPC() {
+        if (npc != null && scene != null) {
+            for (UUID uuid : scene.getCameras()) {
+                spawnNPC(getCamera(uuid));
+            }
+            npcSpawned = true;
+        }
+    }
+
+    /**
+     * Spawn the NPC that is bound to this camera
+     * for a specific player.
+     */
+    public void spawnNPC(Camera camera) {
+        if (npc instanceof net.minecraft.world.entity.player.Player) {
+            camera.sendPacket(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, (ServerPlayer) npc));
+            camera.sendPacket(new ClientboundAddPlayerPacket((net.minecraft.world.entity.player.Player) npc));
+            // Enable skin layers
+            npc.getEntityData().set(new EntityDataAccessor<>(17 /* Displayed Skin Parts */, EntityDataSerializers.BYTE),
+                    (byte) 127 /* Display all skin parts */);
+            // Prevent NPC from showing in tab list
+            Bukkit.getScheduler().runTask(ASmallWorld.inst(), () ->
+                    camera.sendPacket(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, (ServerPlayer) npc)));
+        } else {
+            camera.sendPacket(new ClientboundAddMobPacket(npc));
+        }
+        camera.sendPacket(new ClientboundSetEntityDataPacket(npc.getId(), npc.getEntityData(), false));
+        camera.sendPacket(new ClientboundMoveEntityPacket.Rot(npc.getId(), (byte) (npc.getYHeadRot() / 360 * 256), (byte) (npc.getXRot() / 360 * 256), true));
+        camera.sendPacket(new ClientboundRotateHeadPacket(npc, (byte) (npc.getYHeadRot() / 360 * 256)));
+    }
+
+    /**
+     * Teleport the NPC that's bound to this camera.
+     */
+    public void teleportNPC() {
+        if (npc != null && scene != null) {
+            for (UUID uuid : scene.getCameras()) {
+                teleportNPC(getCamera(uuid));
+            }
+        }
+    }
+
+    /**
+     * Teleport the NPC for a specific player.
+     */
+    public void teleportNPC(Camera camera) {
+        camera.sendPacket(new ClientboundTeleportEntityPacket(npc));
+    }
+
+    /**
+     * Move the NPC within 8 blocks of the source location.
+     */
+    public void shortMoveNPC(Location old, Location new_) {
+        if (npc != null && scene != null) {
+            for (UUID uuid : scene.getCameras()) {
+                shortMoveNPC(old, new_, getCamera(uuid));
+            }
+        }
+    }
+
+    /**
+     * Move the NPC within 8 blocks of the source location
+     * for a specific player.
+     */
+    public void shortMoveNPC(Location old, Location new_, Camera camera) {
+        camera.sendPacket(new ClientboundMoveEntityPacket.Pos(npc.getId(),
+                (short) ((new_.getX() * 32 - old.getX() * 32) * 128),
+                (short) ((new_.getY() * 32 - old.getY() * 32) * 128),
+                (short) ((new_.getZ() * 32 - old.getZ() * 32) * 128),
+                npc.isOnGround()));
+    }
+
+    /**
+     * Despawn the NPC that is bound to this camera.
+     */
+    public void despawnNPC() {
+        if (npc != null && scene != null) {
+            for (UUID uuid : scene.getCameras()) {
+                despawnNPC(getCamera(uuid));
+            }
+            npcSpawned = false;
+        }
+    }
+
+    /**
+     * Despawn the NPC that is bound to this camera
+     * for a specific player.
+     */
+    public void despawnNPC(Camera camera) {
+        camera.sendPacket(new ClientboundRemoveEntitiesPacket(npc.getId()));
+    }
+
+    /**
+     * Initialize the NPC that is bound to this Camera.
+     * <p>
+     * If the player has the permission "asw.camera.skin",
+     * the NPC will use the player's skin. Otherwise, a villager
+     * will be spawned as the NPC of the player.
+     */
+    public void initNPC(World world) {
+        npcSpawned = false;
+        if (npc != null) {
+            despawnNPC();
+        }
+        if (hasPermission("asw.camera.skin")) {
+            GameProfile profile = new GameProfile(UUID.randomUUID(), player.getName());
+            GameProfile realProfile = ((CraftPlayer) player).getHandle().getGameProfile();
+            for (Map.Entry<String, Property> entry : realProfile.getProperties().entries()) {
+                profile.getProperties().put(entry.getKey(), entry.getValue());
+            }
+            npc = new ServerPlayer(((CraftServer) Bukkit.getServer()).getHandle().getServer(), ((CraftWorld) world).getHandle(),
+                    profile);
+        } else {
+            npc = new Villager(EntityType.VILLAGER, ((CraftWorld) world).getHandle());
+        }
+    }
+
+    public boolean hasPermission(String permission) {
+        return ASmallWorld.inst().getPerm().has(player, permission);
     }
 
     public void sendMessage(Component component) {
@@ -173,7 +309,7 @@ public class Camera {
 
     public void load() {
         scene = ASmallWorld.inst().getData().getScenes().get(playerData.getInt("scene"));
-        scene.getCameras().add(getUniqueId());
+        scene.addCamera(this);
     }
 
     public void save() {

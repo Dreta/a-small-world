@@ -39,10 +39,13 @@ public class CameraListener implements Listener {
         Camera camera = new Camera(e.getPlayer());
         Camera.getByName().put(e.getPlayer().getName(), camera);
         Camera.getByUUID().put(e.getPlayer().getUniqueId(), camera);
+        camera.load();
+        camera.initNPC(e.getPlayer().getWorld());
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent e) {
+        Camera.getByUUID().get(e.getPlayer().getUniqueId()).save();
         Camera.getByName().remove(e.getPlayer().getName());
         Camera.getByUUID().remove(e.getPlayer().getUniqueId());
     }

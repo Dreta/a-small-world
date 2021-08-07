@@ -31,6 +31,7 @@ import dev.dreta.asmallworld.scene.portal.PortalCommand;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -52,6 +53,8 @@ public final class ASmallWorld extends JavaPlugin {
 
     @Getter
     private Chat chat;
+    @Getter
+    private Permission perm;
 
     public ASmallWorld() {
         inst = this;
@@ -101,6 +104,14 @@ public final class ASmallWorld extends JavaPlugin {
             chat = getServer().getServicesManager().getRegistration(Chat.class).getProvider();
         } else {
             logger.severe("ASW requires vault-compatible permission plugin serving chats.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        if (getServer().getServicesManager().getRegistration(Permission.class) != null) {
+            perm = getServer().getServicesManager().getRegistration(Permission.class).getProvider();
+        } else {
+            logger.severe("ASW requires vault-compatible permission plugin serving permissions.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }

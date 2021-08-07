@@ -33,12 +33,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @CommandAlias("aswscene")
-@CommandPermission("asw.scene")
+@CommandPermission("asw.scene.manage")
 public class SceneCommand extends BaseCommand {
     private static final int PAGE_ITEM_AMOUNT = 5;
 
     @Subcommand("create")
-    @CommandPermission("asw.scene.manage")
     @Description("Creates a scene at your current location.")
     public void create(Player player, String name) {
         Location loc = player.getLocation();
@@ -61,7 +60,6 @@ public class SceneCommand extends BaseCommand {
     }
 
     @Subcommand("unregister")
-    @CommandPermission("asw.scene.manage")
     @Description("Unregisters a scene.")
     public void unregister(CommandSender sender, @Conditions("sceneexist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().remove(id);
@@ -73,14 +71,12 @@ public class SceneCommand extends BaseCommand {
     }
 
     @Subcommand("list")
-    @CommandPermission("asw.scene.manage")
     @Description("Lists all available scenes.")
     public void list(CommandSender sender) {
         list(sender, 1);
     }
 
     @Subcommand("list")
-    @CommandPermission("asw.scene.manage")
     @Description("Lists all available scenes at a specific page.")
     public void list(CommandSender sender, int page) {
         if (ASmallWorld.inst().getData().getScenes().isEmpty()) {
@@ -119,7 +115,6 @@ public class SceneCommand extends BaseCommand {
     }
 
     @Subcommand("teleport")
-    @CommandPermission("asw.scene.manage")
     @Description("Teleports another player to a scene.")
     public void teleport(CommandSender sender, Player target, @Conditions("sceneexist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(id);
