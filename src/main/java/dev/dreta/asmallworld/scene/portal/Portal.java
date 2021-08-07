@@ -134,13 +134,9 @@ public class Portal implements ConfigurationSerializable {
                         Bukkit.getScheduler().runTaskLater(ASmallWorld.inst(), () -> {
                             camera.getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
                             camera.getPlayer().clearTitle();
-                            camera.despawnNPC();
-                            camera.setScene(getTarget());
                             getTarget().teleportPlayer(camera);
                         }, ASmallWorld.inst().getConf().getInt("scene.portal.load-screen.duration") / 100 * 20);
                     } else {
-                        camera.despawnNPC();
-                        camera.setScene(getTarget());
                         getTarget().teleportPlayer(camera);
                     }
                 }, ASmallWorld.inst().getConf().getInt("scene.portal.delay") / 1000 * 20));
