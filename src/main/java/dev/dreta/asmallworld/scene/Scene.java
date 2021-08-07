@@ -249,6 +249,8 @@ public class Scene implements ConfigurationSerializable {
 
     /**
      * Teleport a player to the player area.
+     * You should despawn the NPC before setting the scene and
+     * teleporting.
      *
      * @param camera The player to teleport
      */
@@ -258,6 +260,8 @@ public class Scene implements ConfigurationSerializable {
 
     /**
      * Teleport a player to the player area.
+     * You should despawn the NPC before setting the scene and
+     * teleporting.
      *
      * @param camera   The player to teleport
      * @param location Where to teleport the associated NPC to
@@ -272,11 +276,7 @@ public class Scene implements ConfigurationSerializable {
             camera.initNPC(world);
         }
         camera.getNpc().setPos(location.getX(), location.getY(), location.getZ());
-        if (camera.isNpcSpawned()) {
-            camera.teleportNPC();
-        } else {
-            camera.spawnNPC();
-        }
+        camera.spawnNPC();
         camera.getPlayer().teleport(new Location(world, x + 12 + 0.5, y + HEIGHT - 2, z + FULL_WIDTH + 0.5, 180, 50));
     }
 
