@@ -77,6 +77,12 @@ public class Camera {
     @Getter
     private boolean npcSpawned;
 
+    @Getter
+    private int skin;
+
+    @Getter
+    private boolean finishedSetup;
+
     @SneakyThrows
     public Camera(Player player) {
         this.player = player;
@@ -315,11 +321,15 @@ public class Camera {
             scene = ASmallWorld.inst().getData().getScenes().get(playerData.getInt("scene"));
             scene.teleportPlayer(this, playerData.getLocation("last-location"));
         }
+        finishedSetup = playerData.getBoolean("finished-setup");
+        skin = playerData.getInt("skin", -1);
     }
 
     public void save() {
         playerData.set("scene", scene.getId());
         playerData.set("last-location", new Location(npc.getBukkitEntity().getWorld(), npc.getX(), npc.getY(), npc.getZ()));
+        playerData.set("finished-setup", finishedSetup);
+        playerData.set("skin", skin == -1 ? null : skin);
         playerData.save();
     }
 

@@ -60,18 +60,6 @@ scene:
     fail-not-found:
       text: "The default scene isn\'t specified or isn\'t a scene (config.yml, scene.default-scene). Please contact a server administrator."
       color: "red"
-
-    # The gender information is used to choose the appropriate
-    # skin for players without the custom skin permission.
-    #
-    # Players with the custom skin permission will not see
-    # this message.
-    #
-    # Players will only ever see this message once. If a player
-    # contacts an administrator to change their gender info,
-    # you can do so by changing it in their player data configuration
-    # (available in playerData/(uuid).yml) and doing /aswreload player <uuid>
-    set-gender:
   # Messages related to /aswscene leave.
   leave:
     # Sent if scene.leave-location is null.
