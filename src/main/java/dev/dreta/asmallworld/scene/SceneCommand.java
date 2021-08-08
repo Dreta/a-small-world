@@ -114,7 +114,7 @@ public class SceneCommand extends BaseCommand {
     @Description("Teleports yourself to a scene.")
     public void teleport(Player player, @Conditions("sceneexist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(id);
-        Camera camera = Camera.getCamera(player);
+        Camera camera = Camera.get(player);
         scene.teleportPlayer(camera);
     }
 
@@ -123,7 +123,7 @@ public class SceneCommand extends BaseCommand {
     @Description("Teleports another player to a scene.")
     public void teleport(CommandSender sender, Player target, @Conditions("sceneexist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(id);
-        Camera camera = Camera.getCamera(target);
+        Camera camera = Camera.get(target);
         scene.teleportPlayer(camera);
         sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("scene.teleport.success-other",
                 "{TARGET_NAME}", camera.getName(),
@@ -139,7 +139,7 @@ public class SceneCommand extends BaseCommand {
             player.sendMessage(ASmallWorld.inst().getMsg().getComponent("scene.enter.fail-not-found"));
             return;
         }
-        Camera camera = Camera.getCamera(player);
+        Camera camera = Camera.get(player);
         scene.teleportPlayer(camera);
     }
 
@@ -151,7 +151,7 @@ public class SceneCommand extends BaseCommand {
             player.sendMessage(ASmallWorld.inst().getMsg().getComponent("scene.leave.fail-no-target"));
             return;
         }
-        Camera camera = Camera.getCamera(player);
+        Camera camera = Camera.get(player);
         camera.getScene().removeCamera(camera.getUniqueId());
         camera.despawnNPC();
         camera.setScene(null);

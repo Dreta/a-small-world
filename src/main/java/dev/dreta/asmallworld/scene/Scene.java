@@ -144,7 +144,7 @@ public class Scene implements ConfigurationSerializable {
 
     public void addCamera(Camera camera) {
         for (UUID uuid : cameras) {
-            Camera cam = Camera.getCamera(uuid);
+            Camera cam = Camera.get(uuid);
             if (cam.isNpcSpawned()) {
                 cam.spawnNPC(camera);
             }
@@ -156,10 +156,10 @@ public class Scene implements ConfigurationSerializable {
         if (!cameras.remove(uuid)) {
             return;
         }
-        Camera camera = Camera.getCamera(uuid);
+        Camera camera = Camera.get(uuid);
         camera.despawnNPC();
         for (UUID uid : cameras) {
-            Camera cam = Camera.getCamera(uid);
+            Camera cam = Camera.get(uid);
             if (cam.isNpcSpawned()) {
                 cam.despawnNPC(camera);
             }

@@ -91,15 +91,15 @@ public class Camera {
         playerData.setConfig(YamlConfiguration.loadConfiguration(file));
     }
 
-    public static Camera getCamera(String name) {
+    public static Camera get(String name) {
         return byName.get(name);
     }
 
-    public static Camera getCamera(UUID uuid) {
+    public static Camera get(UUID uuid) {
         return byUUID.get(uuid);
     }
 
-    public static Camera getCamera(Player player) {
+    public static Camera get(Player player) {
         Camera camera = byUUID.get(player.getUniqueId());
         if (camera == null) {
             Camera cam = new Camera(player);
@@ -142,7 +142,7 @@ public class Camera {
     public void spawnNPC() {
         if (npc != null && scene != null) {
             for (UUID uuid : scene.getCameras()) {
-                spawnNPC(getCamera(uuid));
+                spawnNPC(get(uuid));
             }
             npcSpawned = true;
         }
@@ -176,7 +176,7 @@ public class Camera {
     public void teleportNPC() {
         if (npc != null && scene != null) {
             for (UUID uuid : scene.getCameras()) {
-                teleportNPC(getCamera(uuid));
+                teleportNPC(get(uuid));
             }
         }
     }
@@ -194,7 +194,7 @@ public class Camera {
     public void shortMoveNPC(Location old, Location new_) {
         if (npc != null && scene != null) {
             for (UUID uuid : scene.getCameras()) {
-                shortMoveNPC(old, new_, getCamera(uuid));
+                shortMoveNPC(old, new_, get(uuid));
             }
         }
     }
@@ -217,7 +217,7 @@ public class Camera {
     public void despawnNPC() {
         if (npc != null && scene != null) {
             for (UUID uuid : scene.getCameras()) {
-                despawnNPC(getCamera(uuid));
+                despawnNPC(get(uuid));
             }
             npcSpawned = false;
         }

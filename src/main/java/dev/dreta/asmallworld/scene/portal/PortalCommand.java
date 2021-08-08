@@ -44,7 +44,7 @@ public class PortalCommand extends BaseCommand {
     @Subcommand("highlight")
     @Description("Highlights where the portal is within a scene.")
     public void highlight(Player player, @Conditions("sceneexist") int sceneID, int portalID) {
-        Camera camera = Camera.getCamera(player);
+        Camera camera = Camera.get(player);
         Scene scene = ASmallWorld.inst().getData().getScenes().get(sceneID);
         if (!scene.getPortals().containsKey(portalID)) {
             player.sendMessage(ASmallWorld.inst().getMsg().getComponent("portal.portal-dont-exist"));
