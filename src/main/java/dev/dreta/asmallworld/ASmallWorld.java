@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import dev.dreta.asmallworld.data.DataStore;
 import dev.dreta.asmallworld.misc.ReloadCommand;
 import dev.dreta.asmallworld.player.CameraListener;
+import dev.dreta.asmallworld.player.skin.SkinCommand;
 import dev.dreta.asmallworld.scene.Scene;
 import dev.dreta.asmallworld.scene.SceneCommand;
 import dev.dreta.asmallworld.scene.SceneIDValidator;
@@ -124,6 +125,7 @@ public final class ASmallWorld extends JavaPlugin {
         manager.registerCommand(new ReloadCommand());
         manager.registerCommand(new SceneCommand());
         manager.registerCommand(new PortalCommand());
+        manager.registerCommand(new SkinCommand());
 
         // Register listeners
         new CameraListener();
