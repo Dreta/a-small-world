@@ -36,7 +36,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Slime;
-import net.minecraft.world.entity.npc.Villager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -241,8 +240,8 @@ public class Camera {
      * Initialize the NPC that is bound to this Camera.
      * <p>
      * If the player has the permission "asw.camera.skin",
-     * the NPC will use the player's skin. Otherwise, a villager
-     * will be spawned as the NPC of the player.
+     * the NPC will use the player's skin. Otherwise, the player
+     * must use a configured default skin.
      */
     public void initNPC(World world) {
         npcSpawned = false;
@@ -258,7 +257,16 @@ public class Camera {
             npc = new ServerPlayer(((CraftServer) Bukkit.getServer()).getHandle().getServer(), ((CraftWorld) world).getHandle(),
                     profile);
         } else {
-            npc = new Villager(EntityType.VILLAGER, ((CraftWorld) world).getHandle());
+            GameProfile profile = new GameProfile(UUID.randomUUID(), player.getName());
+            int skin = this.skin == -1 ? ASmallWorld.inst().getConf().getInt("skins.default") : this.skin;
+            if (!ASmallWorld.inst().getConf().contains("skins.skins." + skin)) {
+                throw new IllegalArgumentException("Default skin invalid");
+            }
+            profile.getProperties().put("textures", new Property("textures",
+                    ASmallWorld.inst().getConf().getString("skins.skins." + skin + ".data"),
+                    ASmallWorld.inst().getConf().getString("skins.skins." + skin + ".signature")));
+            npc = new ServerPlayer(((CraftServer) Bukkit.getServer()).getHandle().getServer(), ((CraftWorld) world).getHandle(),
+                    profile);
         }
     }
 
