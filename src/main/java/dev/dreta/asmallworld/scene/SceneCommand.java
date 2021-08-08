@@ -33,11 +33,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @CommandAlias("aswscene")
-@CommandPermission("asw.scene.manage")
+@CommandPermission("asw.scene")
 public class SceneCommand extends BaseCommand {
     private static final int PAGE_ITEM_AMOUNT = 5;
 
     @Subcommand("create")
+    @CommandPermission("asw.scene.manage")
     @Description("Creates a scene at your current location.")
     public void create(Player player, String name) {
         Location loc = player.getLocation();
@@ -60,6 +61,7 @@ public class SceneCommand extends BaseCommand {
     }
 
     @Subcommand("unregister")
+    @CommandPermission("asw.scene.manage")
     @Description("Unregisters a scene.")
     public void unregister(CommandSender sender, @Conditions("sceneexist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().remove(id);
@@ -71,12 +73,14 @@ public class SceneCommand extends BaseCommand {
     }
 
     @Subcommand("list")
+    @CommandPermission("asw.scene.manage")
     @Description("Lists all available scenes.")
     public void list(CommandSender sender) {
         list(sender, 1);
     }
 
     @Subcommand("list")
+    @CommandPermission("asw.scene.manage")
     @Description("Lists all available scenes at a specific page.")
     public void list(CommandSender sender, int page) {
         if (ASmallWorld.inst().getData().getScenes().isEmpty()) {
@@ -106,6 +110,7 @@ public class SceneCommand extends BaseCommand {
     }
 
     @Subcommand("teleport")
+    @CommandPermission("asw.scene.manage")
     @Description("Teleports yourself to a scene.")
     public void teleport(Player player, @Conditions("sceneexist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(id);
@@ -114,6 +119,7 @@ public class SceneCommand extends BaseCommand {
     }
 
     @Subcommand("teleport")
+    @CommandPermission("asw.scene.manage")
     @Description("Teleports another player to a scene.")
     public void teleport(CommandSender sender, Player target, @Conditions("sceneexist") int id) {
         Scene scene = ASmallWorld.inst().getData().getScenes().get(id);
@@ -123,5 +129,32 @@ public class SceneCommand extends BaseCommand {
                 "{TARGET_NAME}", camera.getName(),
                 "{TARGET_DISPLAY_NAME}", camera.getDisplayName(),
                 "{TARGET_SCENE_NAME}", scene.getName()));
+    }
+
+    @Subcommand("enter")
+    @Description("Enter the rabbit hole of the small world.")
+    public void enter(Player player) {
+        Scene scene = ASmallWorld.inst().getData().getScenes().get(ASmallWorld.inst().getConf().getInt("scene.default-scene", Integer.MIN_VALUE));
+        if (scene == null) {
+            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("scene.enter.fail-not-found"));
+            return;
+        }
+        Camera camera = Camera.getCamera(player);
+        scene.teleportPlayer(camera);
+    }
+
+    @Subcommand("leave")
+    @Description("Leave the small world.")
+    public void leave(Player player) {
+        Location location = ASmallWorld.inst().getConf().getLocation("scene.leave-location");
+        if (location == null) {
+            player.sendMessage(ASmallWorld.inst().getMsg().getComponent("scene.leave.fail-no-target"));
+            return;
+        }
+        Camera camera = Camera.getCamera(player);
+        camera.getScene().removeCamera(camera.getUniqueId());
+        camera.despawnNPC();
+        camera.setScene(null);
+        player.teleport(location);
     }
 }

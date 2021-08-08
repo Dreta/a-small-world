@@ -115,7 +115,9 @@ public class Camera {
             this.scene.removeCamera(getUniqueId());
         }
         this.scene = scene;
-        this.scene.addCamera(this);
+        if (scene != null) {
+            this.scene.addCamera(this);
+        }
     }
 
     public String getName() {

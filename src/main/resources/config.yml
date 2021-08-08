@@ -22,6 +22,19 @@ scene:
   # for a list of possible block types.
   wall: BROWN_TERRACOTTA
 
+  # The default scene to start from when a player uses
+  # /aswscene enter.
+  default-scene: 0
+
+  # The location that the player will be teleported to
+  # once they leave.
+  leave-location:
+    ==: org.bukkit.Location # Do not modify this line
+    world: world # Name of the world
+    x: 0
+    y: 0
+    z: 0
+
   # Configuration related to portals.
   portal:
     # The maximum amount of blocks allowed within one portal.
