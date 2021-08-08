@@ -308,12 +308,15 @@ public class Camera {
     }
 
     public void load() {
-        scene = ASmallWorld.inst().getData().getScenes().get(playerData.getInt("scene"));
-        scene.addCamera(this);
+        if (playerData.contains("scene")) {
+            scene = ASmallWorld.inst().getData().getScenes().get(playerData.getInt("scene"));
+            scene.teleportPlayer(this, playerData.getLocation("last-location"));
+        }
     }
 
     public void save() {
         playerData.set("scene", scene.getId());
+        playerData.set("last-location", new Location(npc.getBukkitEntity().getWorld(), npc.getX(), npc.getY(), npc.getZ()));
         playerData.save();
     }
 
