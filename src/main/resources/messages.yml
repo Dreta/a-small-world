@@ -50,6 +50,39 @@ reload:
       - text: " in that player's data file."
         color: "green"
 
+# Messages related to /aswskin.
+skin:
+  get:
+    # Message sent for the skin of a player.
+    # Available placeholders: {NAME}, {DISPLAY_NAME}, {SKIN_ID}
+    result:
+      - text: "{DISPLAY_NAME}"
+        color: "yellow"
+      - text: " is using skin "
+        color: "green"
+      - text: "{SKIN_ID}"
+        color: "yellow"
+      - text: "."
+        color: "green"
+  set:
+    # Message sent when the specified skin don't exist.
+    skin-not-found:
+      text: "The skin don't exist."
+      color: "red"
+    # Message sent when the skin is successfully set.
+    # Available placeholders: {NAME}, {DISPLAY_NAME}, {SKIN_ID}
+    success:
+      - text: "Successfully set "
+        color: "green"
+      - text: "{DISPLAY_NAME}"
+        color: "yellow"
+      - text: "'s skin to "
+        color: "green"
+      - text: "{SKIN_ID}"
+        color: "yellow"
+      - text: "."
+        color: "green"
+
 # Messages related to the command /aswscene.
 # Formatted as Minecraft chat components. See config.yml
 # for more examples.

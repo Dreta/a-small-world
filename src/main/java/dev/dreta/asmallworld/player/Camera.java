@@ -24,6 +24,7 @@ import dev.dreta.asmallworld.ASmallWorld;
 import dev.dreta.asmallworld.scene.Scene;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.identity.Identity;
@@ -77,9 +78,11 @@ public class Camera {
     private boolean npcSpawned;
 
     @Getter
+    @Setter
     private int skin;
 
     @Getter
+    @Setter
     private boolean finishedSetup;
 
     @SneakyThrows

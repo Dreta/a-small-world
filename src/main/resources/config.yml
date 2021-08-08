@@ -22,9 +22,11 @@ skins:
   default: 0 # Steve
 
   # The available skins for players without the custom skin permission.
-  # Players without the custom skin permission can change their skin with
-  # /aswplayer skin. You can also create a skin store shop that includes
-  # command interaction points for /aswplayer skin to create a more immersive
+  # You change change the skin for players through /aswskin <player> <skin id>.
+  # The selected skin won't display for players with the custom skin permission.
+  #
+  # Suggestion: You can also create a skin store shop that includes
+  # command interaction points for /aswskin to create a more immersive
   # experience.
   #
   # Example shown below with the default Steve and Alex skin.
