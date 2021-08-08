@@ -116,7 +116,7 @@ public class Scene implements ConfigurationSerializable {
      * The cameras that are currently in this scene.
      */
     @Getter
-    private final List<UUID> cameras = new ArrayList<>();
+    private final Set<UUID> cameras = new HashSet<>();
 
     public Scene(String name, World world, int x, int y, int z, List<Portal> portals) {
         this(ASmallWorld.inst().getData().getScenes().isEmpty() ? 0 :
