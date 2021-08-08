@@ -22,8 +22,11 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Subcommand;
 import dev.dreta.asmallworld.ASmallWorld;
+import dev.dreta.asmallworld.player.Camera;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 @CommandAlias("aswreload")
 @CommandPermission("asw.manage")
@@ -32,6 +35,23 @@ public class ReloadCommand extends BaseCommand {
     public void reload(CommandSender sender) {
         ASmallWorld.inst().getConf().reload();
         ASmallWorld.inst().getMsg().reload();
-        sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("reloaded"));
+        sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("reload.core-reloaded"));
+    }
+
+    @Subcommand("player")
+    private static class PlayerSub extends BaseCommand {
+        @Default
+        public void warn(CommandSender sender) {
+            sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("reload.player.warning"));
+        }
+
+        @Subcommand("confirm")
+        public void player(CommandSender sender, Player player) {
+            Camera camera = Camera.get(player);
+            camera.load();
+            sender.sendMessage(ASmallWorld.inst().getMsg().getComponent("reload.player.success",
+                    "{NAME}", player.getName(),
+                    "{DISPLAY_NAME}", camera.getDisplayName()));
+        }
     }
 }

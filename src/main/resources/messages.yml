@@ -20,10 +20,35 @@
 # NOTE: This MUST be a string. You CAN NOT use a chat component here.
 scene-not-found: "This scene don't exist."
 
-# Message sent when ASW is reloaded.
-reloaded:
-  text: "Successfully reloaded A Small World."
-  color: "green"
+# Messages related to /aswreload.
+reload:
+  # Message sent when config.yml and messages.yml is reloaded.
+  core-reloaded:
+    text: "Successfully reloaded the core configurations of A Small World."
+    color: "green"
+  # Messages related to /aswreload player.
+  player:
+    # Warning message for reloading players.
+    warning:
+      - text: "Warning: Reloading players can cause strange issues such as data inconsistencies and players suddenly being teleported to another scene with their NPC not being with them. Before reloading, ask the player to leave ASW, or you risk creating a terrible experience for players. To continue, type in "
+        color: "red"
+      - text: "/aswreload player confirm (your arguments)"
+        color: "yellow"
+      - text: "."
+        color: "red"
+    # Message sent when the reload is successful.
+    # Available placeholders: {NAME}, {DISPLAY_NAME}
+    success:
+      - text: "Successfully reloaded the player data of "
+        color: "green"
+      - text: "{DISPLAY_NAME}"
+        color: "yellow"
+      - text: ". If you encounter issues with the NPC being in the wrong scene for the reloaded player, delete the entire line starting with "
+        color: "green"
+      - text: "last-location" # I know people will be stupid enough to disregard the warnings
+        color: "yellow"
+      - text: " in that player's data file."
+        color: "green"
 
 # Messages related to the command /aswscene.
 # Formatted as Minecraft chat components. See config.yml
@@ -35,6 +60,18 @@ scene:
     fail-not-found:
       text: "The default scene isn\'t specified or isn\'t a scene (config.yml, scene.default-scene). Please contact a server administrator."
       color: "red"
+
+    # The gender information is used to choose the appropriate
+    # skin for players without the custom skin permission.
+    #
+    # Players with the custom skin permission will not see
+    # this message.
+    #
+    # Players will only ever see this message once. If a player
+    # contacts an administrator to change their gender info,
+    # you can do so by changing it in their player data configuration
+    # (available in playerData/(uuid).yml) and doing /aswreload player <uuid>
+    set-gender:
   # Messages related to /aswscene leave.
   leave:
     # Sent if scene.leave-location is null.

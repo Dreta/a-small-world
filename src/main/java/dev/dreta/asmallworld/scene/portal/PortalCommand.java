@@ -170,7 +170,7 @@ public class PortalCommand extends BaseCommand {
     }
 
     @Subcommand("blocks")
-    public class Blocks extends BaseCommand {
+    private class Blocks extends BaseCommand {
         @Subcommand("highlight")
         @Description("Highlight the blocks of a portal within a scene.")
         public void highlight(Player player, @Conditions("sceneexist") int sceneID, int portalID) {
