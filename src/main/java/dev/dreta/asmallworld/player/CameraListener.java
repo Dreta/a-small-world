@@ -45,7 +45,9 @@ public class CameraListener implements Listener {
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent e) {
-        Camera.getByUUID().get(e.getPlayer().getUniqueId()).save();
+        Camera camera = Camera.getByUUID().get(e.getPlayer().getUniqueId());
+        camera.save();
+        camera.getScene().getCameras().remove(camera.getUniqueId());
         Camera.getByName().remove(e.getPlayer().getName());
         Camera.getByUUID().remove(e.getPlayer().getUniqueId());
     }
