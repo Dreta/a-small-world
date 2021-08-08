@@ -310,6 +310,7 @@ public class Camera {
     }
 
     public void load() {
+        playerData.reload();
         if (playerData.contains("scene")) {
             scene = ASmallWorld.inst().getData().getScenes().get(playerData.getInt("scene"));
             scene.teleportPlayer(this, playerData.getLocation("last-location"));
