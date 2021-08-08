@@ -19,6 +19,7 @@
 package dev.dreta.asmallworld.data;
 
 import dev.dreta.asmallworld.ASmallWorld;
+import dev.dreta.asmallworld.player.Camera;
 import dev.dreta.asmallworld.scene.Scene;
 import dev.dreta.asmallworld.scene.portal.Portal;
 import dev.dreta.asmallworld.utils.configuration.Configuration;
@@ -67,6 +68,9 @@ public class DataStore extends Configuration {
     @Override
     public void save() {
         saveScenes();
+        for (Camera camera : Camera.getByUUID().values()) {
+            camera.save();
+        }
         super.save();
     }
 }
