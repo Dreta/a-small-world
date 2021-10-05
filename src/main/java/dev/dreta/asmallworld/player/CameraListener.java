@@ -40,7 +40,6 @@ public class CameraListener implements Listener {
         Camera.getByName().put(e.getPlayer().getName(), camera);
         Camera.getByUUID().put(e.getPlayer().getUniqueId(), camera);
         camera.load();
-        camera.initNPC(e.getPlayer().getWorld());
     }
 
     @EventHandler

@@ -91,13 +91,13 @@ scene:
   enter:
     # Sent if scene.default-scene isn't a scene.
     fail-not-found:
-      text: "The default scene isn\'t specified or isn\'t a scene (config.yml, scene.default-scene). Please contact a server administrator."
+      text: "The default scene isn''t specified or isn''t a scene (config.yml, scene.default-scene). Please contact a server administrator."
       color: "red"
   # Messages related to /aswscene leave.
   leave:
     # Sent if scene.leave-location is null.
     fail-no-target:
-      text: "The leave location couldn\'t be found (config.yml, scene.leave-location). Please contact a server administrator."
+      text: "The leave location couldn''t be found (config.yml, scene.leave-location). Please contact a server administrator."
       color: "red"
   # Messages related to /aswscene create.
   create:

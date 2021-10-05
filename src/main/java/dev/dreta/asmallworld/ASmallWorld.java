@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import dev.dreta.asmallworld.data.DataStore;
 import dev.dreta.asmallworld.misc.ReloadCommand;
 import dev.dreta.asmallworld.player.CameraListener;
+import dev.dreta.asmallworld.player.CameraMovementListener;
 import dev.dreta.asmallworld.player.skin.SkinCommand;
 import dev.dreta.asmallworld.scene.Scene;
 import dev.dreta.asmallworld.scene.SceneCommand;
@@ -129,6 +130,7 @@ public final class ASmallWorld extends JavaPlugin {
 
         // Register listeners
         new CameraListener();
+        new CameraMovementListener();
 
         logger.info("Hello, a small world!\nSuccessfully enabled ASW.");
     }
