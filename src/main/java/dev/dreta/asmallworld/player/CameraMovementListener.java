@@ -39,8 +39,7 @@ public class CameraMovementListener implements Listener {
         if (camera.getScene() == null || !camera.isNpcSpawned()) {
             return; // Don't handle players that aren't in a scene.
         }
-        // TODO Save NPC X/Y/Z/Y Head Rot/X Rot and set them on load
-        // FIXME NPC "half-stuck" in the border wall when colliding
+
         // Handle typical moving (x/z)
         double offsetX = e.getTo().getX() - e.getFrom().getX();
         double offsetZ = e.getTo().getZ() - e.getFrom().getZ();
@@ -50,6 +49,9 @@ public class CameraMovementListener implements Listener {
                     camera.getNpc().getY(),
                     camera.getNpc().getZ() + offsetZ * MOVE_SPEED_SCALE);
 
+            // FIXME NPC rotates in wrong direction when rotating below
+            //       Solution: Add a "hint rotation" that's a bit tilted to the right direction
+            //                 so the game knows that's how to rotate
             // Rotate the NPC accordingly to the new direction that the NPC
             // is walking in.
             float yHeadRot = 0;
@@ -61,9 +63,10 @@ public class CameraMovementListener implements Listener {
             } else if (offsetZ < 0) {
                 yHeadRot = 180;
             }
-            camera.rotateNPC(yHeadRot, xRot);
+            camera.rotateNPC(yHeadRot, yHeadRot, xRot);
             // Set the proper rotation on the NPC object itself
             camera.getNpc().setYHeadRot(yHeadRot);
+            camera.getNpc().setYBodyRot(yHeadRot);
             camera.getNpc().setXRot(xRot);
 
             // Order matters. We must rotate first and move later

@@ -222,10 +222,10 @@ public class Camera {
     /**
      * Rotate the NPC's head and body.
      */
-    public void rotateNPC(float yHeadRot, float xRot) {
+    public void rotateNPC(float yHeadRot, float yBodyRot, float xRot) {
         if (npc != null && scene != null) {
             for (UUID uuid : scene.getCameras()) {
-                rotateNPC(yHeadRot, xRot, get(uuid));
+                rotateNPC(yHeadRot, yBodyRot, xRot, get(uuid));
             }
         }
     }
@@ -233,8 +233,8 @@ public class Camera {
     /**
      * Rotate the NPC's head and body for a specific player.
      */
-    public void rotateNPC(float yHeadRot, float xRot, Camera camera) {
-        camera.sendPacket(new ClientboundMoveEntityPacket.Rot(npc.getId(), (byte) (yHeadRot / 360 * 256), (byte) (xRot / 360 * 256), true));
+    public void rotateNPC(float yHeadRot, float yBodyRot, float xRot, Camera camera) {
+        camera.sendPacket(new ClientboundMoveEntityPacket.Rot(npc.getId(), (byte) (yBodyRot / 360 * 256), (byte) (xRot / 360 * 256), true));
         camera.sendPacket(new ClientboundRotateHeadPacket(npc, (byte) (yHeadRot / 360 * 256)));
     }
 
